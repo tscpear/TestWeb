@@ -1,0 +1,48 @@
+.mycaseform {
+  background-color: #E0FFFF;
+  background-image: url('../../../img/5.jpg');
+  background-position: 100% 10%;
+  background-attachment: fixed;
+  height: 100%;
+}
+.mycaseform .item {
+  margin: 5px 5px;
+  width: 50%;
+  padding-right: 5px;
+  float: left;
+  padding-left: 5px;
+}
+.items {
+  margin: 5px 5px;
+  width: 49%;
+  padding-right: 5px;
+  float: left;
+  padding-left: 5px;
+}
+.do {
+  background-color: rgba(255, 255, 255, 0.7) ! important;
+}
+.contentMaxHeight {
+  overflow: 'auto';
+  position: 'fixed';
+}
+.home {
+  width: 100%;
+  height: 100%;
+  background-image: url('../../../img/apilist.jpeg');
+  background-attachment: fixed;
+  background-position: 50% 38%;
+}
+.ant-table {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000;
+}
+.ant-table .ant-table-tbody > tr:hover > td {
+  background-color: rgba(90, 68, 255, 0.2);
+}
+.ant-select-customize-input {
+  background-color: rgba(255, 255, 255, 0.5) ! important;
+}
+.ant-select-selector {
+  background-color: rgba(255, 255, 255, 0.5) ! important;
+}
