@@ -222,7 +222,7 @@ export default class AddUpdata extends Component {
                 response = await addApiData(value);
             }
             if (response.data.code || response.data.code == 1) {
-                this.props.history.push('/apitest/uri')
+                this.props.history.goBack();
             } else {
                 const msg = response.data.msg
                 message.error(msg)
@@ -391,7 +391,7 @@ export default class AddUpdata extends Component {
                         <Input className='do' />
                     </Form.Item>
                     <Form.Item className='item' label='设备终端' name='device' rules={rules} >
-                        <Select dropdownClassName='do' autoFocus={true} style = {{width:'200px'}}>
+                        <Select  autoFocus={true} style = {{width:'200px'}}>
                             <Select.Option value='0'>请选择设备</Select.Option>
                             <Select.Option value='1'>知轮后台</Select.Option>
                             <Select.Option value='2'>知轮商家</Select.Option>

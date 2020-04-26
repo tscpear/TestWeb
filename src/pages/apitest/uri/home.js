@@ -116,12 +116,19 @@ export default class UriHome extends Component {
             },
             {
                 title: '用例数量',
-                dataIndex: 'testNum',
                 key: 'testNum',
                 align: "center",
-                width: 100
+                width: 100,
+                render: (apiList) => {
+                    return (
+                        <div>
+                            <a onClick={()=>this.props.history.push('/apitest/uri/apicaselist', apiList)}>{apiList.testNum}</a>
+                        </div>
+
+                    )
+                }
             },
-            {
+            {   
                 title: '操作',
                 align: 'center',
                 key: 'action',
@@ -139,6 +146,8 @@ export default class UriHome extends Component {
         ]
 
     }
+
+
 
     addCase = async (id) => {
         this.setState({ loading: true })
@@ -232,13 +241,13 @@ export default class UriHome extends Component {
 
 
     }
-    handleChange = (value) => {
+    deviceChange = (value) => {
         this.rearchChange(value, 1)
     }
-    uriValueChange = (value) => {
+    apiPathChange = (value) => {
         this.rearchChange(value, 2)
     }
-    uriMarkChange = (value) => {
+    apiMarkChange = (value) => {
         this.rearchChange(value, 3)
     }
     clear = () => {
@@ -256,7 +265,7 @@ export default class UriHome extends Component {
         const { apiList, total, loading, obj } = this.state
         const title = (
             <span>
-                <Select style={{ width: 150 }} defaultValue={obj.device} onChange={this.handleChange}>
+                <Select style={{ width: 150 }} value={obj.device} onChange={this.deviceChange}>
                     <Option value='0'>请选择设备</Option>
                     <Option value='1'>知轮后台</Option>
                     <Option value='2'>知轮商家</Option>
@@ -271,9 +280,9 @@ export default class UriHome extends Component {
                     <Option value='11'>车服H5</Option>
                     <Option value='12'>知轮车队</Option>
                 </Select>
-                <Input style={{ width: 200, margin: "0 15px" }} placeholder='路径' value={obj.apiPath} onChange={event => this.uriValueChange(event)} className='do'>
+                <Input style={{ width: 200, margin: "0 15px" }} placeholder='路径' value={obj.apiPath} onChange={event => this.apiPathChange(event)} className='do'>
                 </Input>
-                <Input style={{ width: 200, margin: "0 15px" }} placeholder='描述' value={obj.apiMark} onChange={event => this.uriMarkChange(event)} className='do'>
+                <Input style={{ width: 200, margin: "0 15px" }} placeholder='描述' value={obj.apiMark} onChange={event => this.apiMarkChange(event)} className='do'>
                 </Input>
                 <Button type="primary" onClick={() => this.clear()}>
                     清空

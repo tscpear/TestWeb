@@ -107,11 +107,67 @@ export default class ApiCaseHome extends Component {
                 title: '用例等级',
                 dataIndex: 'apiCaseLv',
                 key: 'apiCaseLv',
+                width: 100,
+                align: "center",
+                render: apiCaseLv =>{
+                    let color
+                    let value
+                    switch(apiCaseLv){
+                        case '1':
+                            color = 'green';
+                            value = '无关紧要';
+                            break;
+                        case '2':
+                            color = 'blue';
+                            value = '一般般啦';
+                            break;
+                        case '3':
+                            color = 'red';
+                            value = '叼的一匹';
+                            break;
+                        default:
+                            break;
+                        
+                    }
+                    return (
+                        <Tag color={color} key={value}>
+                            {value}
+                        </Tag>
+                    )
+                }
             },
             {
                 title: '用例类型',
                 dataIndex: 'apiCaseType',
                 key: 'apiCaseType',
+                width: 100,
+                align: "center",
+                render: apiCaseType =>{
+                    let color
+                    let value
+                    switch(apiCaseType){
+                        case '1':
+                            color = 'green';
+                            value = '任意使用';
+                            break;
+                        case '2':
+                            color = 'blue';
+                            value = '仅限流程';
+                            break;
+                        case '3':
+                            color = 'red';
+                            value = '内部消耗';
+                            break;
+                        default:
+                            break;
+                        
+                    }
+                    return (
+                        <Tag color={color} key={value}>
+                            {value}
+                        </Tag>
+                    )
+                }
             },
             {
                 title: '操作',
@@ -121,7 +177,7 @@ export default class ApiCaseHome extends Component {
                 render: (apiCaseList) => {
                     return (<div >
                         <a style={{ padding: "0 5px" }} onClick={() => this.addCase(apiCaseList.id)}><PlusOutlined /></a>
-                        <a style={{ padding: "0 5px" }}onClick={() => this.goToCase(apiCaseList.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
+                        <a style={{ padding: "0 5px" }} onClick={() => this.goToCase(apiCaseList.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
                         <a style={{ padding: "0 5px" }} onClick={() => this.delApi(apiCaseList.id)}><DeleteOutlined twoToneColor="red" />
                         </a>
                     </div>)
@@ -152,15 +208,56 @@ export default class ApiCaseHome extends Component {
     //执行异步任务
     componentDidMount() {
         const { obj } = this.state
+        const apiList = this.props.location.state;
+        if(apiList){
+            const apiPath = apiList.apiPath;
+            obj.apiPath = apiPath;
+        }
         this.getApiCaseList(obj)
     }
+
+    rearchChange = (value, type) => {
+        const { obj } = this.state
+        obj.page = 1
+        if (type === 1) {
+            obj.device = value
+        } else if (type === 2) {
+            obj.apiPath = value.target.value
+        } else if (type === 3) {
+            obj.apiCaseMark = value.target.value
+        }
+        this.setState({ obj: obj })
+        console.log(this.state.obj)
+        this.getApiCaseList(obj)
+
+
+    }
+
+    deviceChange = (value) => {
+        this.rearchChange(value, 1)
+    }
+    apiPathChange = (value) => {
+        this.rearchChange(value, 2)
+    }
+    apiCaseMarkChange = (value) => {
+        this.rearchChange(value, 3)
+    }
+    clear = () => {
+        const { obj } = this.state
+        obj.device = '0'
+        obj.apiPath = ''
+        obj.apiCaseMark = ''
+        this.setState({ obj: obj })
+        this.getApiCaseList(obj)
+    }
+
 
     render() {
 
         const { apiCaseList, loading, total, obj } = this.state;
         const title = (
             <span>
-                <Select style={{ width: 150 }} defaultValue={obj.device} onChange={this.handleChange}>
+                <Select style={{ width: 150 }} value={obj.device} onChange={this.deviceChange}>
                     <Option value='0'>请选择设备</Option>
                     <Option value='1'>知轮后台</Option>
                     <Option value='2'>知轮商家</Option>
@@ -175,9 +272,9 @@ export default class ApiCaseHome extends Component {
                     <Option value='11'>车服H5</Option>
                     <Option value='12'>知轮车队</Option>
                 </Select>
-                <Input style={{ width: 200, margin: "0 15px" }} placeholder='路径' value={obj.apiPath} onChange={event => this.uriValueChange(event)} className='do'>
+                <Input style={{ width: 200, margin: "0 15px" }} placeholder='路径' value={obj.apiPath} onChange={event => this.apiPathChange(event)} className='do'>
                 </Input>
-                <Input style={{ width: 200, margin: "0 15px" }} placeholder='描述' value={obj.apiMark} onChange={event => this.uriMarkChange(event)} className='do'>
+                <Input style={{ width: 200, margin: "0 15px" }} placeholder='描述' value={obj.apiCaseMark} onChange={event => this.apiCaseMarkChange(event)} className='do'>
                 </Input>
                 <Button type="primary" onClick={() => this.clear()}>
                     清空
@@ -185,7 +282,7 @@ export default class ApiCaseHome extends Component {
             </span>
         )
         return (
-            <Card title={title} className='apihomep' >
+            <Card title={title} className='apihomep apiCaseList' >
                 <Table
                     columns={this.columns}
                     dataSource={apiCaseList}

@@ -5,10 +5,10 @@ import {
     Card, Form, Input, Select, Button,
     Tag, Radio, Checkbox, Row, Col, Switch, message
 } from 'antd'
-import { ArrowLeftOutlined} from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
-import {addApiCaseData} from '../../../api/index'
+import { addApiCaseData, updateApiCaseData } from '../../../api/index'
 
 export default class CaseAddUpdate extends Component {
     state = {
@@ -22,12 +22,12 @@ export default class CaseAddUpdate extends Component {
             webformFiexdParam: [],
             webformParamType: [],
             bodyParamType: [],
-            bodyHandleParam:[],
+            bodyHandleParam: [],
             isDepend: true,
-            status:'200',
-            otherAssertioin:[],
+            statusAssertion: '200',
+            otherAssertioin: [],
 
-          
+
         },
         isRelyDisplay: 'block',
         apiFiexdParamDisplay: 'none',
@@ -37,7 +37,7 @@ export default class CaseAddUpdate extends Component {
         webformHandleDisplay: 'none',
         bodyParamDisplay: 'none',
         bodyHandleDisplay: 'none',
-        isDependDisplay:'none'
+        isDependDisplay: 'none'
 
     }
 
@@ -57,6 +57,11 @@ export default class CaseAddUpdate extends Component {
         const data = this.props.location.state;
         this.setState({ data })
         const apiParamtype = data.apiParamtype;
+        if(data.id){
+                this.setState({title:'编辑用例',className:'myform contentMaxHeight caseadd'})
+        }else{
+            this.setState({title:'新增用例',className:'myform contentMaxHeight caseupdate'})
+        }
 
         if (apiParamtype === '3') {
             this.setState({ apiFiexdParamDisplay: 'block' })
@@ -90,8 +95,8 @@ export default class CaseAddUpdate extends Component {
             }
         })
         const isDepend = data.isDepend;
-        if(isDepend){
-            this.setState({isDependDisplay:'block'})
+        if (isDepend) {
+            this.setState({ isDependDisplay: 'block' })
         }
 
     }
@@ -109,6 +114,7 @@ export default class CaseAddUpdate extends Component {
             bodyParamDisplay,
             webformFiexdParam,
             isDependDisplay,
+          
         } = this.state;
 
         //一级方法
@@ -253,7 +259,7 @@ export default class CaseAddUpdate extends Component {
         //     }
         // }
 
-        const onFinish =async(value) => {
+        const onFinish = async (value) => {
             delete (value['apiMark']);
             delete (value['apiPath']);
             delete (value['headerFiexdParam']);
@@ -266,15 +272,30 @@ export default class CaseAddUpdate extends Component {
             const user = memoryUtils.user;
             const data = this.props.location.state;
             const apiId = data.apiId;
-            let values = Object.assign(value, { "userId": user.id,'apiId':apiId })
-            const response = await addApiCaseData(values);
-            const result = response.data;
-            if(result.code==1){
-                this.props.history.push('/apitest/uri')
-            }else{
-                const msg = response.data.msg
-                message.error(msg)
+            let values = Object.assign(value, { "userId": user.id, 'apiId': apiId })
+            let response;
+            let result; 
+            if (data.id) {
+                value = Object.assign(value, { "id": this.props.location.state.id })
+                response = await updateApiCaseData(values);
+                result = response.data;
+                if (result.code == 1) {
+                    this.props.history.goBack();
+                } else {
+                    const msg = response.data.msg
+                    message.error(msg)
+                }   
+            } else {
+                response = await addApiCaseData(values);
+                result = response.data;
+                if (result.code == 1) {
+                    this.props.history.goBack();
+                } else {
+                    const msg = response.data.msg
+                    message.error(msg)
+                }
             }
+
         }
 
         //二级页面的标题
@@ -284,7 +305,7 @@ export default class CaseAddUpdate extends Component {
                     <ArrowLeftOutlined style={{ color: 'green' }} />
                 </a>
                 <span style={{ padding: '0px 15px' }}>
-                    新增用例
+                    {this.state.title}
                 </span>
             </span>)
 
@@ -301,7 +322,7 @@ export default class CaseAddUpdate extends Component {
 
             <Card
                 title={title}
-                className='myform contentMaxHeight caseadd'
+                className={this.state.className}
             >
                 <Form
                     name='form'
@@ -335,7 +356,7 @@ export default class CaseAddUpdate extends Component {
                         </Radio.Group>
                     </Form.Item>
 
-                    <div style={{ width: '100%', display:isDependDisplay}}>
+                    <div style={{ width: '100%', display: isDependDisplay }}>
                         <Form.Item className='item' label='开启依赖' name='isDepend'>
                             <Switch onChange={this.isRelyOnChange} defaultChecked />
                         </Form.Item>
@@ -393,7 +414,7 @@ export default class CaseAddUpdate extends Component {
                             </div>
                         </Form.Item>
                     </div>
-                    <Form.Item className='item' label='响应断言' name='status'>
+                    <Form.Item className='item' label='响应断言' name='statusAssertion'>
                         <Select dropdownClassName='do' autoFocus='true' style={{ width: '100px' }} defaultValue='200'>
                             <Select.Option value='200'>200</Select.Option>
                             <Select.Option value='403'>403</Select.Option>

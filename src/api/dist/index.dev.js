@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getApiCaseData = exports.getApiCaseList = exports.addApiCaseData = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
+exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
 
 var _ajax = _interopRequireDefault(require("./ajax"));
 
@@ -27,15 +27,15 @@ exports.reqLogin = reqLogin;
 var getApiUriList = function getApiUriList(obj) {
   var url = "/api/list?page=".concat(obj.page, "&limit=").concat(obj.limit);
 
-  if (obj.uriValue || !obj.uriValue === '') {
+  if (obj.apiPath || obj.apiPath !== '') {
     url = url + "&apiPath=".concat(obj.apiPath);
   }
 
-  if (obj.uriMark || !obj.uriMark === '') {
+  if (obj.uriMark || obj.apiMark !== '') {
     url = url + "&apiMark=".concat(obj.apiMark);
   }
 
-  if (obj.device && !obj.device === '0') {
+  if (obj.device && obj.device !== '0') {
     url = url + "&device=".concat(obj.device);
   }
 
@@ -74,12 +74,6 @@ var getApiForCaseData = function getApiForCaseData(apiId) {
 
 exports.getApiForCaseData = getApiForCaseData;
 
-var addApiCaseData = function addApiCaseData(apiCaseData) {
-  return (0, _ajax["default"])('/apicase/add', apiCaseData, 'POST');
-};
-
-exports.addApiCaseData = addApiCaseData;
-
 var getApiCaseList = function getApiCaseList(obj) {
   var url = "/apicase/list?page=".concat(obj.page, "&limit=").concat(obj.limit);
 
@@ -88,10 +82,10 @@ var getApiCaseList = function getApiCaseList(obj) {
   }
 
   if (obj.apiCaseMark || !obj.apiCaseMark === '') {
-    url = url + "&apiMark=".concat(obj.apiCaseMark);
+    url = url + "&apiCaseMark=".concat(obj.apiCaseMark);
   }
 
-  if (obj.device && !obj.device === '0') {
+  if (obj.device && obj.device !== '0') {
     url = url + "&device=".concat(obj.device);
   }
 
@@ -105,3 +99,15 @@ var getApiCaseData = function getApiCaseData(id) {
 };
 
 exports.getApiCaseData = getApiCaseData;
+
+var updateApiCaseData = function updateApiCaseData(apiCaseData) {
+  return (0, _ajax["default"])('/apicase/update', apiCaseData, 'POST');
+};
+
+exports.updateApiCaseData = updateApiCaseData;
+
+var addApiCaseData = function addApiCaseData(apiCaseData) {
+  return (0, _ajax["default"])('/apicase/add', apiCaseData, 'POST');
+};
+
+exports.addApiCaseData = addApiCaseData;

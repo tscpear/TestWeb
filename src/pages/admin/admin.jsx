@@ -28,7 +28,6 @@ export default class Admin extends Component {
                 <Sider style={{position:'fixed', minHeight: '100%'}}><LeftNav /></Sider>
                 <Layout style={{marginLeft:'200px'}}>
                     <Header style={{position:'relative',top:0}}>
-
                     </Header>
                     <Content style={{ mbackgroundColor: '#fff'}}>
                         <Switch>
@@ -38,8 +37,7 @@ export default class Admin extends Component {
                             <Redirect to='/home'></Redirect>
                         </Switch>
                     </Content>
-
-                    <Footer style={{textAlign: 'center' ,position:'fixed',bottom:0,width:'100%'}}>唐胖传奇</Footer>
+                    <Footer style={{textAlign: 'center' ,position:'fixed',bottom:0,width:'100%'}}>锄禾日当午，汗滴禾下午</Footer>
                 </Layout>
             </Layout>
         )
