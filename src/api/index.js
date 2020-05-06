@@ -31,7 +31,7 @@ export const updateApiData = (api) => ajax('/api/update', api, 'POST')
 
 export const delApiData = (id) => ajax(`/api/del`, id, 'POST')
 
-export const getApiForCaseData = (apiId) => ajax(`/apicase/caseAdd?apiId=${apiId}`, {}, 'GET')
+export const getApiForCaseData = (apiId,userId) => ajax(`/apicase/caseAdd?apiId=${apiId}&userId=${userId}`, {}, 'GET')
 
 
 
@@ -51,10 +51,16 @@ export const getApiCaseList = (obj) => {
     return ajax(url, {}, 'GET');
 }
 
-export const getApiCaseData = (id) => ajax(`/apicase/caseUpdate?id=${id}`, {}, 'GET')
+export const getApiCaseData = (id,userId) => ajax(`/apicase/caseUpdate?id=${id}&userId=${userId}`, {}, 'GET')
 
 export const updateApiCaseData = (apiCaseData) => ajax('/apicase/update', apiCaseData, 'POST')
 
 export const addApiCaseData = (apiCaseData) => ajax('/apicase/add', apiCaseData, 'POST')
 
+export const delApiCaseData = (id,userId) => ajax (`/apicase/del?id=${id}&userId=${userId}`,{},'POST')
 
+export const getApiReport = (testIdList) => ajax('/report/list',testIdList,"POST")
+
+export const searchTest = (value) => ajax(`/api/searchRely?path=${value}`,{},'GET')
+
+export const searchTestName = (value) => ajax(`/api/searchRelyName?path=${value}`,{},'GET')

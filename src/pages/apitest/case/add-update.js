@@ -37,8 +37,12 @@ export default class CaseAddUpdate extends Component {
         webformHandleDisplay: 'none',
         bodyParamDisplay: 'none',
         bodyHandleDisplay: 'none',
-        isDependDisplay: 'none'
-
+        isDependDisplay: 'none',
+        rules: [{
+            required: true,
+            whitespace: true,
+            message: "这你都不填，你以为你是客服吗！",
+        },]
     }
 
 
@@ -57,10 +61,10 @@ export default class CaseAddUpdate extends Component {
         const data = this.props.location.state;
         this.setState({ data })
         const apiParamtype = data.apiParamtype;
-        if(data.id){
-                this.setState({title:'编辑用例',className:'myform contentMaxHeight caseadd'})
-        }else{
-            this.setState({title:'新增用例',className:'myform contentMaxHeight caseupdate'})
+        if (data.id) {
+            this.setState({ title: '编辑用例', className: 'myform contentMaxHeight caseadd' })
+        } else {
+            this.setState({ title: '新增用例', className: 'myform contentMaxHeight caseupdate' })
         }
 
         if (apiParamtype === '3') {
@@ -114,7 +118,7 @@ export default class CaseAddUpdate extends Component {
             bodyParamDisplay,
             webformFiexdParam,
             isDependDisplay,
-          
+            rules,
         } = this.state;
 
         //一级方法
@@ -274,7 +278,7 @@ export default class CaseAddUpdate extends Component {
             const apiId = data.apiId;
             let values = Object.assign(value, { "userId": user.id, 'apiId': apiId })
             let response;
-            let result; 
+            let result;
             if (data.id) {
                 value = Object.assign(value, { "id": this.props.location.state.id })
                 response = await updateApiCaseData(values);
@@ -284,7 +288,7 @@ export default class CaseAddUpdate extends Component {
                 } else {
                     const msg = response.data.msg
                     message.error(msg)
-                }   
+                }
             } else {
                 response = await addApiCaseData(values);
                 result = response.data;
@@ -316,6 +320,31 @@ export default class CaseAddUpdate extends Component {
                 return { 'initialValues': data }
             }
         }
+
+        const deviceTypeList = () => {
+            const lists =  [true,true,true,true,true,true,true]
+            const data = this.props.location.state;
+            const device = data.device
+            const list = data.deviceTypeList;
+            list.map(item=>{
+                lists[item-1] = false
+            })
+            const store = (
+                <Radio.Group>
+                    <Radio value='1' disabled={lists[0]}><Tag color="magenta">网红授权/取货点/网红店旗下服务车</Tag></Radio>
+                    <Radio value='2' disabled={lists[1]}><Tag color="magenta">非授权门店</Tag></Radio>
+                    <Radio value='3' disabled={lists[2]}><Tag color="magenta">社会服务车</Tag></Radio>
+                    <Radio value='4' disabled={lists[3]}><Tag color="magenta">取货方门店</Tag></Radio>
+                    <Radio value='5' disabled={lists[4]}><Tag color="magenta">取货方门店下服务车</Tag></Radio>
+                    <Radio value='6' disabled={lists[5]}><Tag color="magenta">取货方社会服务车</Tag></Radio>
+                </Radio.Group>
+            )
+
+            switch (device) {
+                case '2':
+                    return store;
+            }
+        }
         return (
 
 
@@ -338,17 +367,20 @@ export default class CaseAddUpdate extends Component {
                     <Form.Item className='item' label='接口描述' name='apiMark'>
                         <Input className='do' disabled />
                     </Form.Item>
-                    <Form.Item className='item' label='用例描述' name='apiCaseMark'>
+                    <Form.Item className='itemss' label='角色类型' name='deviceType' rules={rules}>
+                        {deviceTypeList()}
+                    </Form.Item>
+                    <Form.Item className='item' label='用例描述' name='apiCaseMark' rules={rules}>
                         <Input className='do' />
                     </Form.Item>
-                    <Form.Item className='item' label='用例类型' name='apiCaseType'>
+                    <Form.Item className='item' label='用例类型' name='apiCaseType' rules={rules}>
                         <Radio.Group>
                             <Radio value='1'><Tag color="green">任意使用</Tag></Radio>
                             <Radio value='2'><Tag color="geekblue">仅限流程</Tag></Radio>
                             <Radio value='3'><Tag color="red">内部消耗</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item className='item' label='用例等级' name='apiCaseLv'>
+                    <Form.Item className='item' label='用例等级' name='apiCaseLv' rules={rules}>
                         <Radio.Group>
                             <Radio value='1'><Tag color="green">无关紧要</Tag></Radio>
                             <Radio value='2'><Tag color="geekblue">一般般啦</Tag></Radio>

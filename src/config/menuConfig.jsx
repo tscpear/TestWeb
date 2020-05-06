@@ -22,6 +22,16 @@ const menuList = [
                 title: '用例管理',
                 key: '/apitest/case',
                 icon: <HeartTwoTone twoToneColor="#eb2f96" />
+            },
+            {
+                title:'用例合集',
+                key:'/apitest/group',
+                icon: <HeartTwoTone twoToneColor="#eb2f96" />
+            },
+            {
+                title:'报告管理',
+                key:'/apitest/report',
+                icon: <HeartTwoTone twoToneColor="#eb2f96" />
             }
         ]
     }

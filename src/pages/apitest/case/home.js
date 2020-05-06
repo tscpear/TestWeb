@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Table, Button, message, Tag, Select, Input } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { getApiCaseData, getApiCaseList } from '../../../api/index'
+import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { getApiCaseData, getApiCaseList, delApiCaseData } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
@@ -13,6 +13,8 @@ export default class ApiCaseHome extends Component {
         total: 0,
         apiCaseList: [],
         loading: false,
+        selectedRowKeys: [],
+        selectedTestId: [],
         obj: {
             page: 1,
             apiPath: '',
@@ -21,6 +23,11 @@ export default class ApiCaseHome extends Component {
             limit: PAGE_SIZE
         },
         apiCaseData: {},
+        rules: [{
+            required: true,
+            whitespace: true,
+            message: "这你都不填，你以为你是客服吗！",
+        },]
     }
 
     getApiCaseList = async (obj) => {
@@ -109,10 +116,10 @@ export default class ApiCaseHome extends Component {
                 key: 'apiCaseLv',
                 width: 100,
                 align: "center",
-                render: apiCaseLv =>{
+                render: apiCaseLv => {
                     let color
                     let value
-                    switch(apiCaseLv){
+                    switch (apiCaseLv) {
                         case '1':
                             color = 'green';
                             value = '无关紧要';
@@ -127,7 +134,7 @@ export default class ApiCaseHome extends Component {
                             break;
                         default:
                             break;
-                        
+
                     }
                     return (
                         <Tag color={color} key={value}>
@@ -142,10 +149,10 @@ export default class ApiCaseHome extends Component {
                 key: 'apiCaseType',
                 width: 100,
                 align: "center",
-                render: apiCaseType =>{
+                render: apiCaseType => {
                     let color
                     let value
-                    switch(apiCaseType){
+                    switch (apiCaseType) {
                         case '1':
                             color = 'green';
                             value = '任意使用';
@@ -160,7 +167,7 @@ export default class ApiCaseHome extends Component {
                             break;
                         default:
                             break;
-                        
+
                     }
                     return (
                         <Tag color={color} key={value}>
@@ -176,7 +183,7 @@ export default class ApiCaseHome extends Component {
                 width: 100,
                 render: (apiCaseList) => {
                     return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={() => this.addCase(apiCaseList.id)}><PlusOutlined /></a>
+                        {/* <a style={{ padding: "0 5px" }} onClick={() => this.addCase(apiCaseList.id)}><PlusOutlined /></a> */}
                         <a style={{ padding: "0 5px" }} onClick={() => this.goToCase(apiCaseList.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
                         <a style={{ padding: "0 5px" }} onClick={() => this.delApi(apiCaseList.id)}><DeleteOutlined twoToneColor="red" />
                         </a>
@@ -187,9 +194,26 @@ export default class ApiCaseHome extends Component {
         ]
 
     }
-    goToCase = async (id) => {
+
+    delApi = async (id) => {
+        const { obj } = this.state;
+        const userId = memoryUtils.user.id;
         this.setState({ loading: true })
-        const response = await getApiCaseData(id)
+        const response = await delApiCaseData(id, userId)
+        this.setState({ loading: false })
+        const result = response.data
+        if (result.code === 1) {
+            this.getApiCaseList(obj)
+        } else {
+            const msg = result.msg
+            message.error(msg)
+        }
+    }
+
+    goToCase = async (id) => {
+        const userId = memoryUtils.user.id;
+        this.setState({ loading: true });
+        const response = await getApiCaseData(id, userId)
         this.setState({ loading: false })
         const result = response.data
         if (result.code === 1) {
@@ -209,7 +233,7 @@ export default class ApiCaseHome extends Component {
     componentDidMount() {
         const { obj } = this.state
         const apiList = this.props.location.state;
-        if(apiList){
+        if (apiList) {
             const apiPath = apiList.apiPath;
             obj.apiPath = apiPath;
         }
@@ -250,11 +274,21 @@ export default class ApiCaseHome extends Component {
         this.setState({ obj: obj })
         this.getApiCaseList(obj)
     }
+    onSelectChange = selectedRowKeys => {
+        const { apiCaseList } = this.state;
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        let selectedTestId = [];
+        selectedRowKeys.map(item => {
+            selectedTestId.push(apiCaseList[item].id)
+        })
+        this.setState({ selectedRowKeys,selectedTestId });
+    };
 
 
     render() {
 
-        const { apiCaseList, loading, total, obj } = this.state;
+        const { apiCaseList, loading, total, obj, rules, selectedTestId, selectedRowKeys
+        } = this.state;
         const title = (
             <span>
                 <Select style={{ width: 150 }} value={obj.device} onChange={this.deviceChange}>
@@ -281,9 +315,24 @@ export default class ApiCaseHome extends Component {
         </Button>
             </span>
         )
+        const rowSelection = {
+            onChange: this.onSelectChange,
+
+        };
+
+
+        const extra = (
+            <Button type="primary" onClick={() => this.props.history.push('/apitest/case/dotest', selectedTestId)} disabled={
+                selectedRowKeys.length == 0 ? true : false
+            }>
+                <PlayCircleOutlined />
+                执行用例
+            </Button>
+        )
         return (
-            <Card title={title} className='apihomep apiCaseList' >
+            <Card title={title} className='apihomep apiCaseList' extra={extra}>
                 <Table
+                    rowSelection={{ ...rowSelection }}
                     columns={this.columns}
                     dataSource={apiCaseList}
                     loading={loading}

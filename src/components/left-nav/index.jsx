@@ -58,14 +58,18 @@ class LeftNav extends Component {
     }
 
     render() {
-
         let path = this.props.location.pathname
-
-
         if(path.indexOf('/apitest/uri')===0){
             path = '/apitest/uri'
-        }
+        }else if(path.indexOf('/apitest/case')===0){
+            path = '/apitest/case'
+        }else if(path.indexOf('/apitest/report')===0){
+            path = '/apitest/report'
+        }else if(path.indexOf('/apitest/group')===0){
+            path = '/apitest/group'
+        }else{
 
+        }
         const openKey = this.openKey
 
 
@@ -79,7 +83,6 @@ class LeftNav extends Component {
                 <div className='left-nav-header-menu'>
                     <Menu
                         selectedKeys={[path]}
-                        defaultOpenKeys={[openKey]}
                         mode="inline"
                         theme="dark"
                     >

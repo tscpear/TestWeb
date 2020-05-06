@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
+exports.searchTestName = exports.searchTest = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
 
 var _ajax = _interopRequireDefault(require("./ajax"));
 
@@ -68,8 +68,8 @@ var delApiData = function delApiData(id) {
 
 exports.delApiData = delApiData;
 
-var getApiForCaseData = function getApiForCaseData(apiId) {
-  return (0, _ajax["default"])("/apicase/caseAdd?apiId=".concat(apiId), {}, 'GET');
+var getApiForCaseData = function getApiForCaseData(apiId, userId) {
+  return (0, _ajax["default"])("/apicase/caseAdd?apiId=".concat(apiId, "&userId=").concat(userId), {}, 'GET');
 };
 
 exports.getApiForCaseData = getApiForCaseData;
@@ -94,8 +94,8 @@ var getApiCaseList = function getApiCaseList(obj) {
 
 exports.getApiCaseList = getApiCaseList;
 
-var getApiCaseData = function getApiCaseData(id) {
-  return (0, _ajax["default"])("/apicase/caseUpdate?id=".concat(id), {}, 'GET');
+var getApiCaseData = function getApiCaseData(id, userId) {
+  return (0, _ajax["default"])("/apicase/caseUpdate?id=".concat(id, "&userId=").concat(userId), {}, 'GET');
 };
 
 exports.getApiCaseData = getApiCaseData;
@@ -111,3 +111,27 @@ var addApiCaseData = function addApiCaseData(apiCaseData) {
 };
 
 exports.addApiCaseData = addApiCaseData;
+
+var delApiCaseData = function delApiCaseData(id, userId) {
+  return (0, _ajax["default"])("/apicase/del?id=".concat(id, "&userId=").concat(userId), {}, 'POST');
+};
+
+exports.delApiCaseData = delApiCaseData;
+
+var getApiReport = function getApiReport(testIdList) {
+  return (0, _ajax["default"])('/report/list', testIdList, "POST");
+};
+
+exports.getApiReport = getApiReport;
+
+var searchTest = function searchTest(value) {
+  return (0, _ajax["default"])("/api/searchRely?path=".concat(value), {}, 'GET');
+};
+
+exports.searchTest = searchTest;
+
+var searchTestName = function searchTestName(value) {
+  return (0, _ajax["default"])("/api/searchRelyName?path=".concat(value), {}, 'GET');
+};
+
+exports.searchTestName = searchTestName;

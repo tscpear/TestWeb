@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { addApiData, updateApiData } from '../../../api/index'
+import { addApiData, updateApiData, searchTest, searchTestName } from '../../../api/index'
 
 import {
     Card, Form, Input, Select, Button,
     Tag, Radio, Checkbox, Row, Col, Switch, message
 } from 'antd'
-import { ArrowLeftOutlined,MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
 
@@ -48,7 +48,16 @@ export default class AddUpdata extends Component {
             required: true,
             whitespace: true,
             message: "这你都不填，你以为你是客服吗！",
-        },]
+        },],
+        apiRelySearch: [],
+        apiRelySearchName: [],
+        headerRelySearch: [],
+        headerRelySearchName: [],
+        webformRelySearch: [],
+        webformRelySearchName: [],
+        bodyRelySearch: [],
+        bodyRelySearchName: [],
+
     }
     //接口参数的点击展示控制器
     apiParamTypeOnChange = e => {
@@ -161,7 +170,6 @@ export default class AddUpdata extends Component {
             }
             if (apiData.isRely) {
                 this.setState({ isRelyDispay: 'block' })
-
             }
         }
 
@@ -176,6 +184,81 @@ export default class AddUpdata extends Component {
 
 
     }
+
+    apiRelySearch = value => {
+        if (value) {
+            this.searchTest(value);
+        } else {
+            this.setState({ apiRelySearch: [] });
+        }
+    };
+
+    apiRelyChange = value => {
+        this.setState({ apiRelySearchValue: value });
+        this.searchTestName(value);
+
+    };
+
+    searchTest = async (value, addName) => {
+        const response = await searchTest(value);
+        const result = response.data;
+        const data = result.data;
+        if (addName === 'header依赖参数') {
+            this.setState({ headerRelySearch: data })
+        }else  if (addName === 'webform依赖参数') {
+            this.setState({ webformRelySearch: data })
+        }else  if (addName === 'body依赖参数') {
+            this.setState({ bodyRelySearch: data })
+        } else {
+            this.setState({ apiRelySearch: data });
+        }
+
+    }
+    searchTestName = async (value, addName) => {
+        const response = await searchTestName(value);
+        const result = response.data;
+        const data = result.data;
+        if (addName === 'header依赖参数') {
+            this.setState({ headerRelySearchName: data })
+        } else if (addName === 'webform依赖参数') {
+            this.setState({ webformRelySearchName: data })
+        } else if (addName === 'body依赖参数') {
+            this.setState({ bodyRelySearchName: data })
+        } else {
+            this.setState({ apiRelySearchName: data })
+        }
+
+    }
+    secondRelySearch = (value, addName) => {
+        if (value) {
+            this.searchTest(value, addName);
+        } else {
+            if (addName === "header依赖参数") {
+                this.setState({ headerRelySearch: [] })
+            } else if (addName === "webform依赖参数") {
+                this.setState({ webformRelySearch: [] })
+            } else if (addName === "body依赖参数") {
+                this.setState({ bodyRelySearch: [] })
+            } else {
+                this.setState({ apiRelySearch: [] });
+            }
+        }
+    };
+
+    secondRelyChange = (value, addName) => {
+        if (addName === 'header依赖参数') {
+            this.setState({ headerRelySearchValue: value });
+        } else if (addName === 'webform依赖参数') {
+            this.setState({ webformRelySearchValue: value });
+        } else if (addName === 'body依赖参数') {
+            this.setState({ bodyRelySearchValue: value });
+        } else {
+            this.setState({ apiRelySearchValue: value });
+        }
+        this.searchTestName(value, addName);
+
+    };
+
     render() {
         const {
             apiData,
@@ -193,8 +276,6 @@ export default class AddUpdata extends Component {
             isRelyDispay,
             rules,
         } = this.state
-
-
 
 
         //二级页面的标题
@@ -300,6 +381,34 @@ export default class AddUpdata extends Component {
                 whitespace: true,
                 message: "咋不填呢",
             }];
+
+            const relyOptions = (addName) => {
+                if (addName === 'header依赖参数') {
+                    const option = this.state.headerRelySearch.map(item => <Select.Option key={item.value}>{item.text}</Select.Option>);
+                    return option;
+                } else if (addName === 'webform依赖参数') {
+                    const option = this.state.webformRelySearch.map(item => <Select.Option key={item.value}>{item.text}</Select.Option>);
+                    return option;
+                } else if (addName === 'body依赖参数') {
+                    const option = this.state.bodyRelySearch.map(item => <Select.Option key={item.value}>{item.text}</Select.Option>);
+                    return option;
+                }
+            }
+
+            const nameOptions = (addName) => {
+                if (addName === 'header依赖参数') {
+                    const option = this.state.headerRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                    return option;
+                }else  if (addName === 'webform依赖参数') {
+                    const option = this.state.webformRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                    return option;
+                }else  if (addName === 'body依赖参数') {
+                    const option = this.state.bodyRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                    return option;
+                }
+            }
+
+
             return (
                 <Form.List name={name} >
                     {(fields, { add, remove }) => {
@@ -312,7 +421,19 @@ export default class AddUpdata extends Component {
                                                 name={[field.name, 'apiPath']}
                                                 fieldKey={[field.fieldKey, 'apiPath']}
                                                 rules={rules}>
-                                                <Input placeholder={threePlaceholder} className='do' />
+                                                <Select
+                                                    showSearch
+                                                    value={this.state.headerRelySearchValue}
+                                                    defaultActiveFirstOption={false}
+                                                    showArrow={false}
+                                                    filterOption={false}
+                                                    placeholder={threePlaceholder}
+                                                    onSearch={value => this.secondRelySearch(value, addName)}
+                                                    onChange={value => this.secondRelyChange(value, addName)}
+                                                    notFoundContent={null}
+                                                >
+                                                    {relyOptions(addName)}
+                                                </Select>
                                             </Form.Item>
                                         </Col>
                                         <Col style={{ width: '30%', padding: '0px 1px 0px 0px' }}>
@@ -330,7 +451,17 @@ export default class AddUpdata extends Component {
                                                 fieldKey={[field.fieldKey, "value"]}
                                                 rules={rules}
                                             >
-                                                <Input placeholder={secondPlaceholder} className='do' />
+                                                <Select
+                                                    showSearch
+                                                    value={this.state.headerRelySearchName}
+                                                    defaultActiveFirstOption={false}
+                                                    showArrow={false}
+                                                    filterOption={false}
+                                                    placeholder={secondPlaceholder}
+                                                    notFoundContent={null}
+                                                >
+                                                    {nameOptions(addName)}
+                                                </Select>
                                             </Form.Item>
                                         </Col>
                                         <Col flex="none" style={{ width: '5%' }} >
@@ -370,8 +501,9 @@ export default class AddUpdata extends Component {
                 return { 'initialValues': apiData }
             }
         }
+        const apiRelyPathOptions = this.state.apiRelySearch.map(item => <Select.Option key={item.value}>{item.text}</Select.Option>);
 
-
+        const apiRelyNameOptions = this.state.apiRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
 
         return (
             <Card title={title} className='myform contentMaxHeight apidatap'>
@@ -391,7 +523,7 @@ export default class AddUpdata extends Component {
                         <Input className='do' />
                     </Form.Item>
                     <Form.Item className='item' label='设备终端' name='device' rules={rules} >
-                        <Select  autoFocus={true} style = {{width:'200px'}}>
+                        <Select autoFocus={true} style={{ width: '200px' }}>
                             <Select.Option value='0'>请选择设备</Select.Option>
                             <Select.Option value='1'>知轮后台</Select.Option>
                             <Select.Option value='2'>知轮商家</Select.Option>
@@ -429,10 +561,32 @@ export default class AddUpdata extends Component {
                     </div>
                     <div style={{ display: apiRelyDispaly, width: '100%', margin: '0px 90px 0px 100px' }}>
                         <Form.Item className='item' style={{ width: '30%' }} name='apiRelyParamName'>
-                            <Input className='do' placeholder='依赖接口' />
+                            <Select
+                                showSearch
+                                value={this.state.apiRelySearchValue}
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                placeholder="请输入依赖的接口"
+                                onSearch={this.apiRelySearch}
+                                onChange={this.apiRelyChange}
+                                notFoundContent={null}
+                            >
+                                {apiRelyPathOptions}
+                            </Select>
                         </Form.Item>
                         <Form.Item className='item' style={{ width: '20%' }} name='apiRelyParamValue'>
-                            <Input className='do' placeholder='依赖参数' />
+                            <Select
+                                showSearch
+                                value={this.state.apiRelySearchName}
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                placeholder="请选择依赖的字段"
+                                notFoundContent={null}
+                            >
+                                {apiRelyNameOptions}
+                            </Select>
                         </Form.Item>
                     </div>
                     <Form.Item className='item' name='headerParam' label='Header' name='headerParamType' >
@@ -507,7 +661,7 @@ export default class AddUpdata extends Component {
                         <Input.TextArea
                             className='do'
                             placeholder="返回值基本格式"
-                            autoSize={{ minRows: 3, maxRows: 10 }}
+                            autoSize={{ minRows: 3, maxRows: 20 }}
                         />
                     </Form.Item>
                     <Form.Item className='item' style={{ textAlign: 'center' }} >
