@@ -13,7 +13,6 @@ import { addApiCaseData, updateApiCaseData } from '../../../api/index'
 export default class CaseAddUpdate extends Component {
     state = {
         data: {
-            IsOpenRely: true,
             selectRelyCase: [{ 'apiPath': '1', 'value': '2' }],
             apiParamtype: [],
             headerParamType: [],
@@ -29,7 +28,7 @@ export default class CaseAddUpdate extends Component {
 
 
         },
-        isRelyDisplay: 'block',
+        isRelyDisplay: 'none',
         apiFiexdParamDisplay: 'none',
         headerParamDisplay: 'none',
         headerHandleDisplay: 'none',
@@ -38,39 +37,63 @@ export default class CaseAddUpdate extends Component {
         bodyParamDisplay: 'none',
         bodyHandleDisplay: 'none',
         isDependDisplay: 'none',
+        headerRelyDisplay: 'none',
+        webformRelyDisplay: 'none',
+        bodyRelyDisplay: 'none',
         rules: [{
             required: true,
             whitespace: true,
             message: "这你都不填，你以为你是客服吗！",
-        },]
+        },],
+        relyTestMarkValue: null,
+        relyTestIdValue: null,
     }
 
 
     //是否被依赖控制器
     isRelyOnChange = e => {
         let isRelyDisplay;
+        let headerRelyDisplay;
+        let webformRelyDisplay;
+        let bodyRelyDisplay;
+        let apiFiexdParamDisplay;
+        const apiParamType = this.props.location.state;
         if (e) {
             isRelyDisplay = 'block';
+            headerRelyDisplay = 'none';
+            webformRelyDisplay = 'none';
+            bodyRelyDisplay = 'none';
+            apiFiexdParamDisplay = 'none';
+
+
+
         } else {
             isRelyDisplay = 'none';
+            headerRelyDisplay = 'block';
+            webformRelyDisplay = 'block';
+            bodyRelyDisplay = 'block';
+            if (apiParamType === "2") {
+                apiFiexdParamDisplay = 'block';
+            }
         }
-        this.setState({ isRelyDisplay })
+        this.setState({ isRelyDisplay, headerRelyDisplay, webformRelyDisplay, bodyRelyDisplay,apiFiexdParamDisplay })
     }
 
     componentDidMount() {
         const data = this.props.location.state;
-        this.setState({ data })
-        const apiParamtype = data.apiParamtype;
+        this.setState({ data });
+        const apiParamType = data.apiParamType;
+        const isDepend = data.isDepend
         if (data.id) {
             this.setState({ title: '编辑用例', className: 'myform contentMaxHeight caseadd' })
         } else {
             this.setState({ title: '新增用例', className: 'myform contentMaxHeight caseupdate' })
         }
 
-        if (apiParamtype === '3') {
+
+        if (apiParamType === '3' || (apiParamType === "2" && !isDepend)) {
             this.setState({ apiFiexdParamDisplay: 'block' })
         }
-
         const headerParamType = data.headerParamType;
         headerParamType.map(item => {
             if (item === '1') {
@@ -98,13 +121,27 @@ export default class CaseAddUpdate extends Component {
                 this.setState({ bodyHandleDisplay: 'inline-block' })
             }
         })
-        const isDepend = data.isDepend;
-        if (isDepend) {
+        const hasRely = data.hasRely;
+        if (hasRely === true) {
             this.setState({ isDependDisplay: 'block' })
+            if (isDepend === true) {
+                this.setState({ isRelyDisplay: 'block' })
+            } else {
+                this.setState({ headerRelyDisplay: 'block' })
+                this.setState({ webformRelyDisplay: 'block' })
+                this.setState({ bodyRelyDisplay: 'block' })
+            }
+        } else {
+            this.setState({
+                isDependDisplay: 'none',
+                isRelyDisplay: 'none',
+                headerRelyDisplay: 'none',
+                webformRelyDisplay: 'none',
+                bodyRelyDisplay: 'none'
+            })
         }
 
     }
-
     render() {
         const {
             isRelyDisplay,
@@ -116,18 +153,37 @@ export default class CaseAddUpdate extends Component {
             webformParamDisplay,
             bodyHandleDisplay,
             bodyParamDisplay,
-            webformFiexdParam,
             isDependDisplay,
             rules,
+            headerRelyDisplay,
+            webformRelyDisplay,
+            bodyRelyDisplay,
+
         } = this.state;
 
         //一级方法
         const frist = (name) => {
-            const rules = [{
-                required: true,
-                whitespace: true,
-                message: "咋不填呢",
-            }];
+            const rules = () => {
+                const rules = [{
+                    required: true,
+                    whitespace: true,
+                    message: "咋不填呢",
+                }];
+                if (isRelyDisplay === "none") {
+                    return { "rule": rules };
+                }
+            }
+            const data = this.props.location.state.selectRelyCase;
+            const getOptionId = (index) => {
+                let option = data[index].relyCase.map(item => <Select.Option key={item.apiCaseId}>{item.apiCaseId}</Select.Option>);
+                return option;
+            }
+            const getOptionMark = (index) => {
+                let option = data[index].relyCase.map(item => <Select.Option key={item.apiCaseId}><Tag color="green">{item.apiCaseId}</Tag>{item.apiCaseMark}</Select.Option>);
+                return option;
+            }
+            // const optionId = this.state.data.map(item => <Select.Option key={item.apiCaseId}>{item.apiCaseId}</Select.Option>);
+            // const optionMark = this.state.data.map(item => <Select.Option key={item.apiCaseId}>{item.apiCaseMark}</Select.Option>);
             return (
                 <Form.List name={name} >
                     {(fields) => {
@@ -139,27 +195,28 @@ export default class CaseAddUpdate extends Component {
                                             <Form.Item
                                                 name={[field.name, 'apiPath']}
                                                 fieldKey={[field.fieldKey, 'apiPath']}
-                                                rules={rules}
+                                                {...rules}
                                             >
-                                                <Input className='do' />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col style={{ width: '5%' }}>
-                                            <Form.Item
-                                                name={[field.name, "apiCaseId"]}
-                                                fieldKey={[field.fieldKey, "apiCaseId"]}
-                                                rules={rules}
-                                            >
-                                                <Input className='do' />
+                                                <Input className='do' disabled />
                                             </Form.Item>
                                         </Col>
                                         <Col style={{ width: '55%' }}>
                                             <Form.Item
                                                 name={[field.name, "apiCaseMark"]}
                                                 fieldKey={[field.fieldKey, "apiCaseMark"]}
-                                                rules={rules}
+                                                {...rules}
                                             >
-                                                <Input className='do' />
+                                                <Select
+                                                    showSearch
+                                                    defaultActiveFirstOption={false}
+                                                    showArrow={false}
+                                                    filterOption={false}
+                                                    placeholder="go"
+                                                    notFoundContent={null}
+
+                                                >
+                                                    {getOptionMark(index)}
+                                                </Select>
                                             </Form.Item>
                                         </Col>
                                     </Row>
@@ -172,11 +229,18 @@ export default class CaseAddUpdate extends Component {
         }
         //二级级方法
         const second = (name, disabled) => {
-            const rules = [{
-                required: true,
-                whitespace: true,
-                message: "咋不填呢",
-            }];
+            const rules = () => {
+                const rules = [{
+                    required: true,
+                    whitespace: true,
+                    message: "咋不填呢",
+                }];
+                if (isRelyDisplay === "none") {
+                    return { "rule": rules };
+                }
+            }
+
+
             return (
                 <Form.List name={name} >
                     {(fields) => {
@@ -188,7 +252,7 @@ export default class CaseAddUpdate extends Component {
                                             <Form.Item
                                                 name={[field.name, 'name']}
                                                 fieldKey={[field.fieldKey, 'name']}
-                                                rules={rules}
+                                                {...rules}
                                             >
                                                 <Input className='do' disabled='true' />
                                             </Form.Item>
@@ -197,7 +261,7 @@ export default class CaseAddUpdate extends Component {
                                             <Form.Item
                                                 name={[field.name, "value"]}
                                                 fieldKey={[field.fieldKey, "value"]}
-                                                rules={rules}
+                                                {...rules}
                                             >
                                                 <Input className='do' disabled={disabled} />
                                             </Form.Item>
@@ -217,6 +281,8 @@ export default class CaseAddUpdate extends Component {
                 whitespace: true,
                 message: "咋不填呢",
             }];
+
+
             return (
                 <Form.List name={name} >
                     {(fields) => {
@@ -251,17 +317,7 @@ export default class CaseAddUpdate extends Component {
             )
         }
 
-        // const isDependDisplay = () => {
-        //     console.log('你妈妈默默')
-        //     let data = this.props.location.state;
-        //     if (data.isDepend) {
 
-        //     } else {
-        //         console.log('你妈妈默默')
-        //         console.log(data.isDepend)
-        //         return ('none')
-        //     }
-        // }
 
         const onFinish = async (value) => {
             delete (value['apiMark']);
@@ -285,6 +341,7 @@ export default class CaseAddUpdate extends Component {
                 result = response.data;
                 if (result.code == 1) {
                     this.props.history.goBack();
+                 
                 } else {
                     const msg = response.data.msg
                     message.error(msg)
@@ -294,6 +351,7 @@ export default class CaseAddUpdate extends Component {
                 result = response.data;
                 if (result.code == 1) {
                     this.props.history.goBack();
+                  
                 } else {
                     const msg = response.data.msg
                     message.error(msg)
@@ -315,19 +373,21 @@ export default class CaseAddUpdate extends Component {
 
         const forms = () => {
             if (this.props.location.state) {
-                return { 'initialValues': this.props.location.state }
+                let data = this.props.location.state;
+                data = Object.assign(data, { "statusAssertion": '200' })
+                return { 'initialValues': data }
             } else {
                 return { 'initialValues': data }
             }
         }
 
         const deviceTypeList = () => {
-            const lists =  [true,true,true,true,true,true,true]
+            const lists = [true, true, true, true, true, true, true]
             const data = this.props.location.state;
             const device = data.device
             const list = data.deviceTypeList;
-            list.map(item=>{
-                lists[item-1] = false
+            list.map(item => {
+                lists[item - 1] = false
             })
             const store = (
                 <Radio.Group>
@@ -345,6 +405,12 @@ export default class CaseAddUpdate extends Component {
                     return store;
             }
         }
+
+        const defaultChecked = () => {
+            if (this.props.location.state.isDepend === true) {
+                return { "defaultChecked": true }
+            }
+        }
         return (
 
 
@@ -360,6 +426,7 @@ export default class CaseAddUpdate extends Component {
                     labelAlign='left'
                     onFinish={onFinish}
                     {...forms()}
+
                 >
                     <Form.Item className='item' label='接口路径' name='apiPath'>
                         <Input className='do' disabled />
@@ -367,7 +434,7 @@ export default class CaseAddUpdate extends Component {
                     <Form.Item className='item' label='接口描述' name='apiMark'>
                         <Input className='do' disabled />
                     </Form.Item>
-                    <Form.Item className='itemss' label='角色类型' name='deviceType' rules={rules}>
+                    <Form.Item className='itemss' label='角色类型' name='deviceType'>
                         {deviceTypeList()}
                     </Form.Item>
                     <Form.Item className='item' label='用例描述' name='apiCaseMark' rules={rules}>
@@ -380,7 +447,7 @@ export default class CaseAddUpdate extends Component {
                             <Radio value='3'><Tag color="red">内部消耗</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item className='item' label='用例等级' name='apiCaseLv' rules={rules}>
+                    <Form.Item className='item' label='用例等级' name='apiCaseLv' rules={rules} >
                         <Radio.Group>
                             <Radio value='1'><Tag color="green">无关紧要</Tag></Radio>
                             <Radio value='2'><Tag color="geekblue">一般般啦</Tag></Radio>
@@ -390,7 +457,7 @@ export default class CaseAddUpdate extends Component {
 
                     <div style={{ width: '100%', display: isDependDisplay }}>
                         <Form.Item className='item' label='开启依赖' name='isDepend'>
-                            <Switch onChange={this.isRelyOnChange} defaultChecked />
+                            <Switch onChange={this.isRelyOnChange} {...defaultChecked()} />
                         </Form.Item>
                         <div style={{ display: isRelyDisplay, width: '100%' }}>
                             <Form.Item label='选择依赖' className='itemss'>
@@ -412,9 +479,15 @@ export default class CaseAddUpdate extends Component {
                                 </div> */}
                                 {second('headerFiexdParam', true)}
                             </div>
-                            <div style={{ width: '45%', display: headerHandleDisplay, verticalAlign: 'top' }}>
-                                {second('headerHandleParam')}
+                            <div style={{ width: '45%', verticalAlign: 'top', display: 'inline-block' }}>
+                                <div style={{ width: '100%', display: headerHandleDisplay }}>
+                                    {second('headerHandleParam')}
+                                </div>
+                                <div style={{ width: '100%', display: headerRelyDisplay }}>
+                                    {second('headerRelyToHandle')}
+                                </div>
                             </div>
+
                         </Form.Item>
                     </div>
                     <div style={{ display: webformParamDisplay, width: '100%' }} >
@@ -422,8 +495,13 @@ export default class CaseAddUpdate extends Component {
                             <div style={{ width: '45%', display: 'inline-block', verticalAlign: 'top' }}>
                                 {second('webformFiexdParam', true)}
                             </div>
-                            <div style={{ width: '45%', display: webformHandleDisplay, verticalAlign: 'top' }}>
-                                {second('webformHandleParam')}
+                            <div style={{ width: '45%', verticalAlign: 'top', display: 'inline-block' }}>
+                                <div style={{ width: '100%', display: webformHandleDisplay }}>
+                                    {second('webformHandleParam')}
+                                </div>
+                                <div style={{ width: '100%', display: webformRelyDisplay }}>
+                                    {second('webformRelyToHandle')}
+                                </div>
                             </div>
                         </Form.Item>
                     </div>
@@ -441,13 +519,18 @@ export default class CaseAddUpdate extends Component {
                                     />
                                 </Form.Item>
                             </div>
-                            <div style={{ width: '45%', display: webformHandleDisplay, verticalAlign: 'top' }}>
-                                {second('bodyHandleParam')}
+                            <div style={{ width: '45%', verticalAlign: 'top', display: 'inline-block' }}>
+                                <div style={{ width: '100%', display: bodyHandleDisplay }}>
+                                    {second('bodyHandleParam')}
+                                </div>
+                                <div style={{ width: '100%', display: bodyRelyDisplay }}>
+                                    {second('bodyformRelyToHandle')}
+                                </div>
                             </div>
                         </Form.Item>
                     </div>
                     <Form.Item className='item' label='响应断言' name='statusAssertion'>
-                        <Select dropdownClassName='do' autoFocus='true' style={{ width: '100px' }} defaultValue='200'>
+                        <Select dropdownClassName='do' autoFocus='true' style={{ width: '100px' }}>
                             <Select.Option value='200'>200</Select.Option>
                             <Select.Option value='403'>403</Select.Option>
                             <Select.Option value='406'>406</Select.Option>

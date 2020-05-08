@@ -24,7 +24,7 @@ export default class AddUpdata extends Component {
             "webformRelyParam": [],
             "webformHandleParam": [],
             "bodyParamType": [],
-            "bodyFiexdParam": [],
+            "bodyFiexdParam": "",
             "bodyRelyParam": [],
             "bodyHandleParam": [],
             "isRely": false,
@@ -214,16 +214,25 @@ export default class AddUpdata extends Component {
         }
 
     }
-    searchTestName = async (value, addName) => {
+    searchTestName = async (value, addName,index) => {
         const response = await searchTestName(value);
         const result = response.data;
         const data = result.data;
         if (addName === 'header依赖参数') {
-            this.setState({ headerRelySearchName: data })
+            let headerRelySearchName = this.state.headerRelySearchName;
+            let headerRelySearchNameObject=Object.assign({"index":index,"value":data});
+            headerRelySearchName.push(headerRelySearchNameObject);
+            this.setState({ headerRelySearchName})
         } else if (addName === 'webform依赖参数') {
-            this.setState({ webformRelySearchName: data })
+            let webformRelySearchName = this.state.headerRelySearchName;
+            let webformRelySearchNameObject=Object.assign({"index":index,"value":data});
+            webformRelySearchName.push(webformRelySearchNameObject);
+            this.setState({ webformRelySearchName})
         } else if (addName === 'body依赖参数') {
-            this.setState({ bodyRelySearchName: data })
+            let bodyRelySearchName = this.state.headerRelySearchName;
+            let bodyRelySearchNameObject=Object.assign({"index":index,"value":data});
+            bodyRelySearchName.push(bodyRelySearchNameObject);
+            this.setState({bodyRelySearchName})
         } else {
             this.setState({ apiRelySearchName: data })
         }
@@ -245,18 +254,8 @@ export default class AddUpdata extends Component {
         }
     };
 
-    secondRelyChange = (value, addName) => {
-        if (addName === 'header依赖参数') {
-            this.setState({ headerRelySearchValue: value });
-        } else if (addName === 'webform依赖参数') {
-            this.setState({ webformRelySearchValue: value });
-        } else if (addName === 'body依赖参数') {
-            this.setState({ bodyRelySearchValue: value });
-        } else {
-            this.setState({ apiRelySearchValue: value });
-        }
-        this.searchTestName(value, addName);
-
+    secondRelyChange = (value, addName,index) => {
+        this.searchTestName(value, addName,index);
     };
 
     render() {
@@ -395,9 +394,14 @@ export default class AddUpdata extends Component {
                 }
             }
 
-            const nameOptions = (addName) => {
+            const nameOptions = (addName,index) => {
                 if (addName === 'header依赖参数') {
-                    const option = this.state.headerRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                    let option;
+                    this.state.headerRelySearchName.map(item => {
+                        if(item.index == index){
+                            option =  item.value.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                        }
+                    });
                     return option;
                 }else  if (addName === 'webform依赖参数') {
                     const option = this.state.webformRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
@@ -423,13 +427,12 @@ export default class AddUpdata extends Component {
                                                 rules={rules}>
                                                 <Select
                                                     showSearch
-                                                    value={this.state.headerRelySearchValue}
                                                     defaultActiveFirstOption={false}
                                                     showArrow={false}
                                                     filterOption={false}
                                                     placeholder={threePlaceholder}
                                                     onSearch={value => this.secondRelySearch(value, addName)}
-                                                    onChange={value => this.secondRelyChange(value, addName)}
+                                                    onChange={value => this.secondRelyChange(value, addName,index)}
                                                     notFoundContent={null}
                                                 >
                                                     {relyOptions(addName)}
@@ -453,14 +456,13 @@ export default class AddUpdata extends Component {
                                             >
                                                 <Select
                                                     showSearch
-                                                    value={this.state.headerRelySearchName}
                                                     defaultActiveFirstOption={false}
                                                     showArrow={false}
                                                     filterOption={false}
                                                     placeholder={secondPlaceholder}
                                                     notFoundContent={null}
                                                 >
-                                                    {nameOptions(addName)}
+                                                    {nameOptions(addName,index)}
                                                 </Select>
                                             </Form.Item>
                                         </Col>

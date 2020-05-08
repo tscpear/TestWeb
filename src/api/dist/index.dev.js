@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.searchTestName = exports.searchTest = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
+exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
 
 var _ajax = _interopRequireDefault(require("./ajax"));
 
@@ -135,3 +135,10 @@ var searchTestName = function searchTestName(value) {
 };
 
 exports.searchTestName = searchTestName;
+
+var getApiGroupList = function getApiGroupList(obj) {
+  var url = "/apigroup/list?page=".concat(obj.page, "&limit=").concat(obj.limit);
+  return (0, _ajax["default"])(url, {}, 'GET');
+};
+
+exports.getApiGroupList = getApiGroupList;

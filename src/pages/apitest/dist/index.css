@@ -70,6 +70,11 @@
   background-attachment: fixed;
   height: 100%;
 }
+.groupHome {
+  background-image: url('../../img/5.jpg');
+  background-attachment: fixed;
+  height: 100%;
+}
 .ant-table {
   background-color: rgba(255, 255, 255, 0.5);
   color: #000;
@@ -107,4 +112,10 @@
   text-shadow: none;
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+.ant-modal-content {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+.ant-modal-header {
+  background-color: rgba(255, 255, 255, 0.2) ! important;
 }
