@@ -89,6 +89,10 @@ export default class ApiCaseHome extends Component {
                             color = '#B23AEE';
                             value = '知轮车服';
                             break;
+                             case '5':
+                            color = '#FFBBFF';
+                            value = '分仓终端';
+                            break;
                         default:
                             break;
                     }
@@ -236,6 +240,7 @@ export default class ApiCaseHome extends Component {
         if (apiList) {
             const apiPath = apiList.apiPath;
             obj.apiPath = apiPath;
+            obj.apiId = apiList.id;
         }
         this.getApiCaseList(obj)
     }
@@ -259,6 +264,7 @@ export default class ApiCaseHome extends Component {
 
     deviceChange = (value) => {
         this.rearchChange(value, 1)
+        
     }
     apiPathChange = (value) => {
         this.rearchChange(value, 2)

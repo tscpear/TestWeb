@@ -2,19 +2,25 @@ import React, { Component } from "react";
 import './../index.less'
 import {
     Card, Form, Input, Select, Button, Popconfirm, Modal, Table,
-    Tag, Radio, Checkbox, Row, Col, Switch, message
+    Tag, Radio, Checkbox, Row, Col, Switch, message, Drawer, List, Avatar, Divider, Collapse
 } from 'antd'
-import { LockOutlined, SendOutlined, SyncOutlined, ExclamationCircleOutlined, ItalicOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { LockOutlined, SendOutlined, SyncOutlined, FileSearchOutlined, ItalicOutlined, PlusOutlined, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { PAGE_SIZE } from '../../../utils/constants'
-import { getApiReport } from '../../../api/index'
+import { getApiReport, putToken, doTest, getOneReport } from '../../../api/index'
+
+const DescriptionItem = ({ title, content }) => (
+    <div className="site-description-item-profile-wrapper">
+        <p className="site-description-item-profile-p-label">{title}:</p>
+        {content}
+    </div>
+);
 
 
 export default class DoTest extends Component {
     state = {
-        visible: false,
+        Modalvisible: false,
         data: [['1', '1', '13588096710'], ['1', '1', '13588096710'], ['1', '1', '13588096710']],
         total: 0,
-        apiList: [],
         loading: false,
         obj: {
             page: 1,
@@ -25,18 +31,28 @@ export default class DoTest extends Component {
         },
         apiData: {},
         apiReport: [],
+        testList: [],
+        groupId: 0,
+        environment: "uat",
+        visible: false,
+        requestData: {
+            apiPath: "asdqweqe",
+            headerParam: [],
+            webformParam: [],
+            bodyParam: [],
 
+        }
     };
 
 
     hideModal = () => {
         this.setState({
-            visible: false,
+            Modalvisible: false,
         });
     };
     showModal = () => {
         this.setState({
-            visible: true,
+            Modalvisible: true,
         });
     };
     //初始化所有的列
@@ -75,6 +91,10 @@ export default class DoTest extends Component {
                             color = '#B23AEE';
                             value = '知轮车服';
                             break;
+                        case '5':
+                            color = '#FFBBFF';
+                            value = '分仓终端';
+                            break;
                         default:
                             break;
                     }
@@ -95,21 +115,31 @@ export default class DoTest extends Component {
             },
             {
                 title: '路径',
-                dataIndex: 'path',
-                key: 'path',
-                align: "center",
+                dataIndex: 'apiPath',
+                key: 'apiPath',
             },
             {
                 title: '描述',
-                dataIndex: 'mark',
-                key: 'mark',
-                align: "center",
+                dataIndex: 'apiCaseMark',
+                key: 'apiCaseMark',
             },
             {
                 title: '执行结果',
-                dataIndex: 'result',
-                key: 'result',
+                dataIndex: 'resultStatus',
+                key: 'resultStatus',
                 align: "center",
+                render: (resultStatus, apiReport) => {
+                    if (resultStatus) {
+                        if (resultStatus == 1) {
+                            return (
+                                <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><CheckCircleTwoTone twoToneColor="#52c41a" /></a>)
+                        } else {
+                            return (
+                                <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><CloseCircleTwoTone twoToneColor="red" /></a>);
+                        }
+                    }
+
+                }
 
 
             },
@@ -118,12 +148,9 @@ export default class DoTest extends Component {
                 align: 'center',
                 key: 'action',
                 width: 100,
-                render: (apiList) => {
+                render: (apiReport) => {
                     return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={() => this.addCase(apiList.id)}><PlusOutlined /></a>
-                        <a onClick={() => this.goToApi(apiList.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
-                        <a style={{ padding: "0 5px" }} onClick={() => this.delApi(apiList.id)}><DeleteOutlined twoToneColor="red" />
-                        </a>
+                        <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
                     </div>)
 
                 }
@@ -136,16 +163,26 @@ export default class DoTest extends Component {
         this.initColumns()
     }
 
+
+
     //执行异步任务
     componentDidMount() {
+        let tokenData
         const testIdList = this.props.location.state;
-        this.getApiReport(testIdList)
+        if (typeof testIdList === "number") {
+            tokenData = { "testList": [], "groupId": testIdList }
+        } else {
+            tokenData = { "testList": testIdList, "groupId": 0 }
+        }
+
+        this.setState({ tokenData });
+        this.getApiReport(tokenData)
     }
 
 
-    getApiReport = async (testIdList) => {
+    getApiReport = async (tokenData) => {
         this.setState({ loading: true })
-        const response = await getApiReport(testIdList)
+        const response = await getApiReport(tokenData)
         this.setState({ loading: false })
         const result = response.data
         if (result.code === 1) {
@@ -164,9 +201,100 @@ export default class DoTest extends Component {
             message.error(msg)
         }
     }
+
+
+    environmentOnChange = (value) => {
+        this.setState({ environment: value })
+    }
+    putToken = async () => {
+        const { environment, tokenData } = this.state;
+        let value = Object.assign(tokenData, { "environment": environment });
+        this.setState({ loading: true })
+        const response = await putToken(value)
+        this.setState({ loading: false })
+        const result = response.data
+        const msg = result.msg
+        if (result.code === 1) {
+
+            message.success(msg);
+
+        } else {
+            message.error(msg)
+        }
+    }
+    doTest = async () => {
+        const { environment, tokenData } = this.state;
+        let value = Object.assign(tokenData, { "environment": environment });
+        this.setState({ loading: true })
+        const response = await doTest(value)
+        this.setState({ loading: false })
+        const result = response.data
+        const msg = result.msg
+
+
+        if (result.code === 1) {
+            const data = result.data;
+            this.setState({ apiReport: data })
+            message.success(msg);
+        } else {
+            message.error(msg)
+        }
+    }
+
+    showDrawer = async (apiReport) => {
+        await this.getOneReport(apiReport.testId, apiReport.reportId);
+        this.setState({
+            visible: true,
+        });
+    };
+
+    onClose = () => {
+        this.setState({
+            visible: false,
+        });
+    };
+    getOneReport = async (testId, reportId) => {
+        this.setState({ loading: true })
+        const response = await getOneReport(testId, reportId)
+        this.setState({ loading: false })
+        const result = response.data
+        if (result.code == 1) {
+            const data = result.data;
+            this.setState({ requestData: data });
+        } else {
+            message.error(result.msg);
+        }
+
+    };
+
+    /**
+     * json展示方法
+     */
+    jsonFormat = (json) => {
+        if (typeof json != 'string') {
+            json = JSON.stringify(json, undefined, 2);
+        }
+        json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span>' + match + '</span>';
+        });
+    }
+
     render() {
 
-        const { data, apiReport, total, loading, obj } = this.state;
+        const { data, apiReport, total, loading, obj, requestData } = this.state;
 
 
 
@@ -188,7 +316,6 @@ export default class DoTest extends Component {
                     break;
             }
             return (
-
                 <div >
                     <div style={{ display: 'inline-block', width: '20%' }}>{device}</div>
                     <div style={{ display: 'inline-block', width: '50%' }}>{deviceType}</div>
@@ -197,25 +324,27 @@ export default class DoTest extends Component {
             )
         }
 
+
+
         const extra = (
             <div>
                 <Button type='primary' onClick={this.showModal} style={{ backgroundColor: '#9BCD9B', border: '1px solid #9BCD9B' }}>
                     <SyncOutlined spin />涉及账号
                  </Button>
-                <Button type='primary' style={{ backgroundColor: 'orange', border: '1px solid orange', margin: '0px 20px' }}>
+                <Button type='primary' style={{ backgroundColor: 'orange', border: '1px solid orange', margin: '0px 20px' }} onClick={this.putToken}>
                     <LockOutlined />固定token
                 </Button>
-                <Select autoFocus='true' style={{ width: '100px' }} defaultValue='1'>
-                    <Select.Option value='1'>准生产</Select.Option>
-                    <Select.Option value='2'>测试次</Select.Option>
-                    <Select.Option value='3'>测试主</Select.Option>
+                <Select autoFocus='true' style={{ width: '100px' }} defaultValue='uat' onChange={this.environmentOnChange}>
+                    <Select.Option value='uat'>准生产</Select.Option>
+                    <Select.Option value='tests'>测试次</Select.Option>
+                    <Select.Option value='test'>测试主</Select.Option>
                 </Select>
-                <Button type='primary' style={{ marginLeft: '20px' }}>
+                <Button type='primary' style={{ marginLeft: '20px' }} onClick={this.doTest}>
                     <SendOutlined />执行用例
                 </Button>
                 <Modal
                     title="涉及账号"
-                    visible={this.state.visible}
+                    visible={this.state.Modalvisible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     footer={null}
@@ -232,6 +361,18 @@ export default class DoTest extends Component {
 
         )
 
+        const dColumns = [
+            {
+                title: 'name',
+                dataIndex: 'name',
+                key: 'name',
+            },
+            {
+                title: 'value',
+                dataIndex: 'value',
+                key: 'value',
+            },
+        ];
 
         return (
             <Card className='doTest myform' extra={extra}>
@@ -251,6 +392,51 @@ export default class DoTest extends Component {
                         }
                     }}
                 />
+                <Drawer
+                    width={640}
+                    placement="right"
+                    closable={false}
+                    onClose={this.onClose}
+                    visible={this.state.visible}
+                >
+                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 请求路径</p>
+                    <p className="site-description-item-profile-p">{requestData.apiMethod}      {requestData.apiPath}</p>
+                    <Divider style={{ backgroundColor: "green" }} />
+
+                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 请求参数</p>
+                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                        <Collapse.Panel header="请求头参数" key="1" showArrow={false}>
+                            <Table
+                                columns={dColumns}
+                                dataSource={requestData.headerParam}
+                                size="small"
+                                pagination={false}
+
+                            />
+
+                        </Collapse.Panel>
+                        <Collapse.Panel header="form表单参数" key="2" showArrow={false}>
+                            <Table
+                                columns={dColumns}
+                                dataSource={requestData.webformParam}
+                                size="small"
+                                pagination={false}>
+
+                            </Table>
+                        </Collapse.Panel>
+                        <Collapse.Panel header="body参数" key="3" showArrow={false}>
+                            <Table
+                                columns={dColumns}
+                                dataSource={requestData.bodyParam}
+                                size="small"
+                                pagination={false}>
+                            </Table>
+                        </Collapse.Panel>
+                    </Collapse>
+                    <Divider style={{ backgroundColor: "green" }} />
+                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 返回值</p>
+                    <pre><code id="json">  {JSON.stringify(requestData.response, undefined, 2)}</code></pre>
+                </Drawer>
             </Card>
         )
     }

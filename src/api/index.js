@@ -33,8 +33,6 @@ export const delApiData = (id) => ajax(`/api/del`, id, 'POST')
 
 export const getApiForCaseData = (apiId, userId) => ajax(`/apicase/caseAdd?apiId=${apiId}&userId=${userId}`, {}, 'GET')
 
-
-
 export const getApiCaseList = (obj) => {
 
     let url = `/apicase/list?page=${obj.page}&limit=${obj.limit}`
@@ -46,6 +44,9 @@ export const getApiCaseList = (obj) => {
     }
     if (obj.device && obj.device !== '0') {
         url = url + `&device=${obj.device}`
+    }
+    if(obj.apiId && obj.apiId != 0){
+        url = url + `&apiId=${obj.apiId}`
     }
 
     return ajax(url, {}, 'GET');
@@ -61,6 +62,8 @@ export const delApiCaseData = (id, userId) => ajax(`/apicase/del?id=${id}&userId
 
 export const getApiReport = (testIdList) => ajax('/report/list', testIdList, "POST")
 
+export const getApiHomeList = (obj) => ajax(`/report/mainList?page=${obj.page}&limit=${obj.limit}`,{},"GET")
+
 export const searchTest = (value) => ajax(`/api/searchRely?path=${value}`, {}, 'GET')
 
 export const searchTestName = (value) => ajax(`/api/searchRelyName?path=${value}`, {}, 'GET')
@@ -69,3 +72,8 @@ export const getApiGroupList = (obj) => {
     let url = `/apigroup/list?page=${obj.page}&limit=${obj.limit}`
     return ajax(url, {}, 'GET')
 }
+export const putToken = (obj) =>ajax("/report/token",obj,"POST")
+
+export const doTest = (obj) => ajax("/report/do",obj,"POST");
+
+export const getOneReport = (testId,reportId) => ajax(`/report/one?testId=${testId}&reportId=${reportId}`,{},'GET')

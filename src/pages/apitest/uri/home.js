@@ -64,6 +64,10 @@ export default class UriHome extends Component {
                             color = '#B23AEE';
                             value = '知轮车服';
                             break;
+                        case '5':
+                            color = '#FFBBFF';
+                            value = '分仓终端';
+                            break;
                         default:
                             break;
                     }
@@ -122,13 +126,13 @@ export default class UriHome extends Component {
                 render: (apiList) => {
                     return (
                         <div>
-                            <a onClick={()=>this.props.history.push('/apitest/uri/apicaselist', apiList)}>{apiList.testNum}</a>
+                            <a onClick={() => this.props.history.push('/apitest/uri/apicaselist', apiList)}>{apiList.testNum}</a>
                         </div>
 
                     )
                 }
             },
-            {   
+            {
                 title: '操作',
                 align: 'center',
                 key: 'action',
@@ -153,7 +157,7 @@ export default class UriHome extends Component {
         const userId = memoryUtils.user.id;
         this.setState({ loading: true })
         console.log(userId)
-        const response = await getApiForCaseData(id,userId)
+        const response = await getApiForCaseData(id, userId)
         this.setState({ loading: false })
         const result = response.data;
         if (result.code === 1) {
@@ -181,7 +185,7 @@ export default class UriHome extends Component {
     }
 
     goToApi = async (id) => {
-      
+
         this.setState({ loading: true })
         console.log("你妈妈吗")
         const response = await getApiData(id)

@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.PAGE_SIZE=void 0;var PAGE_SIZE=15;exports.PAGE_SIZE=PAGE_SIZE;

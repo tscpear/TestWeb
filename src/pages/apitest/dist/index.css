@@ -76,11 +76,15 @@
   height: 100%;
 }
 .ant-table {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.8);
   color: #000;
 }
 .ant-table .ant-table-tbody > tr:hover > td {
   background-color: rgba(90, 68, 255, 0.2);
+}
+.divider {
+  width: 10px;
+  background-color: pink;
 }
 .ant-select-customize-input {
   background-color: rgba(255, 255, 255, 0.5) ! important;

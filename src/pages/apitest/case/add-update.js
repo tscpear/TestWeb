@@ -91,8 +91,9 @@ export default class CaseAddUpdate extends Component {
         }
 
 
-        if (apiParamType === '3' || (apiParamType === "2" && !isDepend)) {
+        if (apiParamType == '3' || (apiParamType == "2" && !isDepend)) {
             this.setState({ apiFiexdParamDisplay: 'block' })
+            
         }
         const headerParamType = data.headerParamType;
         headerParamType.map(item => {
@@ -108,8 +109,9 @@ export default class CaseAddUpdate extends Component {
             if (item === '1') {
                 this.setState({ webformParamDisplay: 'block' })
             }
-            if (item === '3') {
+            if (item === '3') {    
                 this.setState({ webformHandleDisplay: 'inline-block' })
+            
             }
         })
         const bodyParamType = data.bodyParamType;
@@ -459,7 +461,8 @@ export default class CaseAddUpdate extends Component {
                         <Form.Item className='item' label='开启依赖' name='isDepend'>
                             <Switch onChange={this.isRelyOnChange} {...defaultChecked()} />
                         </Form.Item>
-                        <div style={{ display: isRelyDisplay, width: '100%' }}>
+                    </div>
+                    <div style={{ display: isRelyDisplay, width: '100%' }}>
                             <Form.Item label='选择依赖' className='itemss'>
                                 {frist('selectRelyCase')}
                             </Form.Item>
@@ -469,14 +472,9 @@ export default class CaseAddUpdate extends Component {
                                 <Input placeholder='请输入参数' className='do' />
                             </Form.Item>
                         </div>
-                    </div>
                     <div style={{ display: headerParamDisplay, width: '100%' }} >
-
                         <Form.Item label='头部参数' className='itemss'>
                             <div style={{ width: '45%', display: 'inline-block', verticalAlign: 'top' }}>
-                                {/* <div style={{ width: '100%', textAlign: "center" }}>
-                                    <p>基本样式</p>
-                                </div> */}
                                 {second('headerFiexdParam', true)}
                             </div>
                             <div style={{ width: '45%', verticalAlign: 'top', display: 'inline-block' }}>

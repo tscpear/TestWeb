@@ -14,7 +14,7 @@ export default class AddUpdata extends Component {
     state = {
         //展示控制器
         apiData: {
-            "apiParamType": [],
+            "apiParamType": "0",
             "apiRelyParamName": null,
             "apiRelyParamValue": null,
             "headerParamType": [],
@@ -313,12 +313,19 @@ export default class AddUpdata extends Component {
 
 
         //一级方法
-        const frist = (name, fristPlaceholder, secondPlaceholder, addName) => {
-            const rules = [{
-                required: true,
-                whitespace: true,
-                message: "咋不填呢",
-            }];
+        const frist = (name, fristPlaceholder, secondPlaceholder, addName,display) => {
+            const rules =() =>{
+                let required = true;
+                if(display=="none"){
+                    required = false;
+                }
+                let rule =[{
+                    required: required,
+                    whitespace: true,
+                    message: "咋不填呢",
+                }]
+                return rule;
+            } ;
             return (
                 <Form.List name={name} >
                     {(fields, { add, remove }) => {
@@ -330,7 +337,7 @@ export default class AddUpdata extends Component {
                                             <Form.Item
                                                 name={[field.name, 'name']}
                                                 fieldKey={[field.fieldKey, 'name']}
-                                                rules={rules}
+                                                rules={rules()}
                                             >
                                                 <Input placeholder={fristPlaceholder} className='do' />
                                             </Form.Item>
@@ -339,7 +346,7 @@ export default class AddUpdata extends Component {
                                             <Form.Item
                                                 name={[field.name, "value"]}
                                                 fieldKey={[field.fieldKey, "value"]}
-                                                rules={rules}
+                                                rules={rules()}
                                             >
                                                 <Input placeholder={secondPlaceholder} className='do' />
                                             </Form.Item>
@@ -374,12 +381,19 @@ export default class AddUpdata extends Component {
         }
 
         //二级方法
-        const second = (name, fristPlaceholder, secondPlaceholder, threePlaceholder, addName) => {
-            const rules = [{
-                required: true,
-                whitespace: true,
-                message: "咋不填呢",
-            }];
+        const second = (name, fristPlaceholder, secondPlaceholder, threePlaceholder, addName,display) => {
+            const rules =() =>{
+                let required = true;
+                if(display=="none"){
+                    required = false;
+                }
+                let rule =[{
+                    required: required,
+                    whitespace: true,
+                    message: "咋不填呢",
+                }]
+                return rule;
+            } ;
 
             const relyOptions = (addName) => {
                 if (addName === 'header依赖参数') {
@@ -424,7 +438,7 @@ export default class AddUpdata extends Component {
                                             <Form.Item
                                                 name={[field.name, 'apiPath']}
                                                 fieldKey={[field.fieldKey, 'apiPath']}
-                                                rules={rules}>
+                                                rules={rules()}>
                                                 <Select
                                                     showSearch
                                                     defaultActiveFirstOption={false}
@@ -443,7 +457,7 @@ export default class AddUpdata extends Component {
                                             <Form.Item
                                                 name={[field.name, 'name']}
                                                 fieldKey={[field.fieldKey, 'name']}
-                                                rules={rules}
+                                                rules={rules()}
                                             >
                                                 <Input placeholder={fristPlaceholder} className='do' />
                                             </Form.Item>
@@ -452,7 +466,7 @@ export default class AddUpdata extends Component {
                                             <Form.Item
                                                 name={[field.name, "value"]}
                                                 fieldKey={[field.fieldKey, "value"]}
-                                                rules={rules}
+                                                rules={rules()}
                                             >
                                                 <Select
                                                     showSearch
@@ -548,7 +562,7 @@ export default class AddUpdata extends Component {
                             <Radio value='3'><Tag color="cyan">PUT</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item className='items' label='接口传参' name='apiParamType' >
+                    <Form.Item className='items' label='接口传参' name='apiParamType'  >
                         <Radio.Group onChange={this.apiParamTypeOnChange} >
                             <Radio value='0'><Tag color="orange">无参数</Tag></Radio>
                             <Radio value='1'><Tag color="orange">固定参数</Tag></Radio>
@@ -600,13 +614,13 @@ export default class AddUpdata extends Component {
                     </Form.Item>
                     <div style={{ width: '100%', margin: '0px 90px 0px 100px' }}>
                         <div style={{ width: '30%', display: headerFiexdParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('headerFiexdParam', '参数名', '参数值', 'header固定参数')}
+                            {frist('headerFiexdParam', '参数名', '参数值', 'header固定参数',headerFiexdParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: headerRelyParamDisplay, margin: '0px 10px', verticalAlign: 'top' }}>
-                            {second('headerRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'header依赖参数')}
+                            {second('headerRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'header依赖参数',headerRelyParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: headerHandleParamDisplay, verticalAlign: 'top', }}>
-                            {frist('headerHandleParam', '参数名', '默认值', 'header自定义参数')}
+                            {frist('headerHandleParam', '参数名', '默认值', 'header自定义参数',headerHandleParamDisplay)}
                         </div>
                     </div>
                     <Form.Item className='item' name='webformParamType' label='webform' >
@@ -618,12 +632,12 @@ export default class AddUpdata extends Component {
                     </Form.Item>
                     <div style={{ width: '100%', margin: '0px 90px 0px 100px' }}>
                         <div style={{ width: '30%', display: webformFiexdParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('webformFiexdParam', '参数名', '参数值', 'webform固定参数')}
+                            {frist('webformFiexdParam', '参数名', '参数值', 'webform固定参数',webformFiexdParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: webformRelyParamDisplay, margin: '0px 10px', verticalAlign: 'top' }}>
-                            {second('webformRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'webform依赖参数')}
+                            {second('webformRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'webform依赖参数',webformRelyParamDisplay)}
                         </div>
-                        <div style={{ width: '30%', display: webformHandleParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
+                        <div style={{ width: '30%', display: webformHandleParamDisplay, verticalAlign: 'top', margin: '0px 10px',webformHandleParamDisplay }}>
                             {frist('webformHandleParam', '参数名', '默认值', 'webform自定义参数')}
                         </div>
                     </div>
@@ -645,10 +659,10 @@ export default class AddUpdata extends Component {
                             </Form.Item>
                         </div>
                         <div style={{ width: '30%', display: bodyRelyParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {second('bodyRelyParam', '参数路径', '依赖参数名', '依赖接口路径', 'body依赖参数')}
+                            {second('bodyRelyParam', '参数路径', '依赖参数名', '依赖接口路径', 'body依赖参数',bodyRelyParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: bodyHandleParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('bodyHandleParam', '参数路径', '默认值', 'body自定义参数')}
+                            {frist('bodyHandleParam', '参数路径', '默认值', 'body自定义参数',bodyHandleParamDisplay)}
                         </div>
                     </div>
                     <Form.Item label='是否被依赖' className='item' name='isRely'>
@@ -656,7 +670,7 @@ export default class AddUpdata extends Component {
                     </Form.Item>
                     <div style={{ width: '100%', margin: '0px 90px 0px 100px' }}>
                         <div style={{ width: '50%', display: isRelyDispay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('relyValue', '依赖值名称', '依赖路径', '需要存起来的依赖值')}
+                            {frist('relyValue', '依赖值名称', '依赖路径', '需要存起来的依赖值',isRelyDispay)}
                         </div>
                     </div>
                     <Form.Item className='item' name='responseBase' label='返回值样式'>

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
+exports.getOneReport = exports.doTest = exports.putToken = exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiHomeList = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
 
 var _ajax = _interopRequireDefault(require("./ajax"));
 
@@ -89,6 +89,10 @@ var getApiCaseList = function getApiCaseList(obj) {
     url = url + "&device=".concat(obj.device);
   }
 
+  if (obj.apiId && obj.apiId != 0) {
+    url = url + "&apiId=".concat(obj.apiId);
+  }
+
   return (0, _ajax["default"])(url, {}, 'GET');
 };
 
@@ -124,6 +128,12 @@ var getApiReport = function getApiReport(testIdList) {
 
 exports.getApiReport = getApiReport;
 
+var getApiHomeList = function getApiHomeList(obj) {
+  return (0, _ajax["default"])("/report/mainList?page=".concat(obj.page, "&limit=").concat(obj.limit), {}, "GET");
+};
+
+exports.getApiHomeList = getApiHomeList;
+
 var searchTest = function searchTest(value) {
   return (0, _ajax["default"])("/api/searchRely?path=".concat(value), {}, 'GET');
 };
@@ -142,3 +152,21 @@ var getApiGroupList = function getApiGroupList(obj) {
 };
 
 exports.getApiGroupList = getApiGroupList;
+
+var putToken = function putToken(obj) {
+  return (0, _ajax["default"])("/report/token", obj, "POST");
+};
+
+exports.putToken = putToken;
+
+var doTest = function doTest(obj) {
+  return (0, _ajax["default"])("/report/do", obj, "POST");
+};
+
+exports.doTest = doTest;
+
+var getOneReport = function getOneReport(testId, reportId) {
+  return (0, _ajax["default"])("/report/one?testId=".concat(testId, "&reportId=").concat(reportId), {}, 'GET');
+};
+
+exports.getOneReport = getOneReport;
