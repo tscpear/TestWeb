@@ -1,5 +1,5 @@
 import React from 'react';
-import {HomeOutlined, HeartTwoTone,SecurityScanOutlined} from '@ant-design/icons';
+import {HomeOutlined, HeartTwoTone,SecurityScanOutlined,StarTwoTone,FireTwoTone,CrownTwoTone } from '@ant-design/icons';
 
 
 const menuList = [
@@ -16,23 +16,34 @@ const menuList = [
             {
                 title: '接口管理',
                 key: '/apitest/uri',
-                icon: <HeartTwoTone twoToneColor="#eb2f96" />
+                icon: <StarTwoTone twoToneColor="white" />
             },
             {
                 title: '用例管理',
                 key: '/apitest/case',
-                icon: <HeartTwoTone twoToneColor="#eb2f96" />
+                icon: <StarTwoTone twoToneColor="white" />
             },
             {
                 title:'用例合集',
                 key:'/apitest/group',
-                icon: <HeartTwoTone twoToneColor="#eb2f96" />
+                icon: <StarTwoTone twoToneColor="white" />
             },
             {
                 title:'报告管理',
                 key:'/apitest/report',
-                icon: <HeartTwoTone twoToneColor="#eb2f96" />
+                icon: <StarTwoTone twoToneColor="white" />
             }
+        ]
+    },  {
+        title: '创建测试数据',
+        key: '/ceatedata',
+        icon: <CrownTwoTone  twoToneColor="white"/>,
+        children: [
+            {
+                title: '网红轮胎数据',
+                key: '/createdata/tire',
+                icon: <FireTwoTone twoToneColor="red" />
+            },
         ]
     }
 ]

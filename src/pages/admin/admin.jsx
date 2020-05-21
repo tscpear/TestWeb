@@ -9,6 +9,7 @@ import ApiTestUri from '../apitest/uri/uri.jsx'
 import ApiTestCase from '../apitest/case/case.jsx'
 import ApiTestReport from '../apitest/report/report.jsx'
 import ApiTestGroup from '../apitest/group/group.jsx'
+import CreateDataTire from '../createData/trie/tire.jsx'
 import './index.less'
 /**
  * 登录的路由组件
@@ -38,6 +39,7 @@ export default class Admin extends Component {
                             <Route path='/apitest/case' component={ApiTestCase}/>
                             <Route path='/apitest/report' component = {ApiTestReport}/>
                             <Route path='/apitest/group' component = {ApiTestGroup}/>
+                            <Route path='/createdata/tire' component = {CreateDataTire}/>
                             <Redirect to='/home'></Redirect>
                         </Switch>
                     </Content>

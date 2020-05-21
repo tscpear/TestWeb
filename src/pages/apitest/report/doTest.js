@@ -129,7 +129,7 @@ export default class DoTest extends Component {
                 key: 'resultStatus',
                 align: "center",
                 render: (resultStatus, apiReport) => {
-                    if (resultStatus) {
+                    if (resultStatus != null) {
                         if (resultStatus == 1) {
                             return (
                                 <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><CheckCircleTwoTone twoToneColor="#52c41a" /></a>)
@@ -143,18 +143,18 @@ export default class DoTest extends Component {
 
 
             },
-            {
-                title: '操作',
-                align: 'center',
-                key: 'action',
-                width: 100,
-                render: (apiReport) => {
-                    return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
-                    </div>)
+            // {
+            //     title: '操作',
+            //     align: 'center',
+            //     key: 'action',
+            //     width: 100,
+            //     render: (apiReport) => {
+            //         return (<div >
+            //             <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
+            //         </div>)
 
-                }
-            }
+            //     }
+            // }
         ]
 
     }
@@ -242,7 +242,7 @@ export default class DoTest extends Component {
     }
 
     showDrawer = async (apiReport) => {
-        await this.getOneReport(apiReport.testId, apiReport.reportId);
+        await this.getOneReport(apiReport.id);
         this.setState({
             visible: true,
         });
@@ -253,9 +253,9 @@ export default class DoTest extends Component {
             visible: false,
         });
     };
-    getOneReport = async (testId, reportId) => {
+    getOneReport = async (id) => {
         this.setState({ loading: true })
-        const response = await getOneReport(testId, reportId)
+        const response = await getOneReport(id)
         this.setState({ loading: false })
         const result = response.data
         if (result.code == 1) {
@@ -373,6 +373,10 @@ export default class DoTest extends Component {
                 key: 'value',
             },
         ];
+        const showTotal = (total, range) => {
+
+            return "共 " + total + " 条"
+        }
 
         return (
             <Card className='doTest myform' extra={extra}>
@@ -382,15 +386,23 @@ export default class DoTest extends Component {
                     loading={loading}
                     bordered
                     size="small"
-                    pagination={{
-                        defaultPageSize: PAGE_SIZE,
-                        total: total,
-                        onChange: (pageNum) => {
-                            obj.page = pageNum
-                            obj.limit = PAGE_SIZE
-                            this.getUriList(obj)
-                        }
-                    }}
+                // pagination={{
+                //     pageSizeOptions:['10', '20', '50', '100','200','500','1000','5000'],
+                //     defaultPageSize: PAGE_SIZE,
+                //     total: total,
+                //     showTotal:showTotal,
+                //     showSizeChanger:true,
+                //     onChange: (pageNum) => {
+                //         obj.page = pageNum
+                //         obj.limit = PAGE_SIZE
+                //         this.getApiReport(obj)
+                //     },
+                //     onShowSizeChange: (current,size) =>{
+                //         obj.page = 1
+                //         obj.limit = size
+                //         this.getApiReport(obj)
+                //     }
+                // }}
                 />
                 <Drawer
                     width={640}
@@ -425,12 +437,7 @@ export default class DoTest extends Component {
                             </Table>
                         </Collapse.Panel>
                         <Collapse.Panel header="body参数" key="3" showArrow={false}>
-                            <Table
-                                columns={dColumns}
-                                dataSource={requestData.bodyParam}
-                                size="small"
-                                pagination={false}>
-                            </Table>
+                            <pre><code id="json">  {JSON.stringify(requestData.bodyParam, undefined, 2)}</code></pre>
                         </Collapse.Panel>
                     </Collapse>
                     <Divider style={{ backgroundColor: "green" }} />

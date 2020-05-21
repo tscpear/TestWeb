@@ -76,4 +76,6 @@ export const putToken = (obj) =>ajax("/report/token",obj,"POST")
 
 export const doTest = (obj) => ajax("/report/do",obj,"POST");
 
-export const getOneReport = (testId,reportId) => ajax(`/report/one?testId=${testId}&reportId=${reportId}`,{},'GET')
+export const getOneReport = (id) => ajax(`/report/one?id=${id}`,{},'GET')
+
+export const crateDataTire = (value,environment) =>ajax(`/createData/tire?orderSn=${value}&environment=${environment}`,{},'GET')

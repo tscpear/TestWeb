@@ -26,6 +26,8 @@ class Header extends Component {
                     path = '/apitest/report'
                 }else if (path.indexOf('/apitest/group') === 0) {
                     path = '/apitest/group'
+                }else if (path.indexOf('/createdata/tire') === 0) {
+                    path = '/createdata/tire'
                 }
             
                 const cItem = item.children.find(cItem => cItem.key === path)

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getOneReport = exports.doTest = exports.putToken = exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiHomeList = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
+exports.crateDataTire = exports.getOneReport = exports.doTest = exports.putToken = exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiHomeList = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
 
 var _ajax = _interopRequireDefault(require("./ajax"));
 
@@ -165,8 +165,14 @@ var doTest = function doTest(obj) {
 
 exports.doTest = doTest;
 
-var getOneReport = function getOneReport(testId, reportId) {
-  return (0, _ajax["default"])("/report/one?testId=".concat(testId, "&reportId=").concat(reportId), {}, 'GET');
+var getOneReport = function getOneReport(id) {
+  return (0, _ajax["default"])("/report/one?id=".concat(id), {}, 'GET');
 };
 
 exports.getOneReport = getOneReport;
+
+var crateDataTire = function crateDataTire(value, environment) {
+  return (0, _ajax["default"])("/createData/tire?orderSn=".concat(value, "&environment=").concat(environment), {}, 'GET');
+};
+
+exports.crateDataTire = crateDataTire;

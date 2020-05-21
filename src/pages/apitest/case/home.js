@@ -335,6 +335,10 @@ export default class ApiCaseHome extends Component {
                 执行用例
             </Button>
         )
+        const showTotal =(total, range) =>{
+            return "共 "+total+" 条"
+        }
+
         return (
             <Card title={title} className='apihomep apiCaseList' extra={extra}>
                 <Table
@@ -347,9 +351,17 @@ export default class ApiCaseHome extends Component {
                     pagination={{
                         defaultPageSize: PAGE_SIZE,
                         total: total,
-                        onChange: (pageNum) => {
+                        pageSizeOptions:['10', '20', '50', '100','200','500','1000','5000'],
+                        showSizeChanger:true,
+                        showTotal:showTotal,
+                        onChange: (pageNum,pageSize) => {
                             obj.page = pageNum
-                            obj.limit = PAGE_SIZE
+                            obj.limit = pageSize
+                            this.getApiCaseList(obj)
+                        },
+                        onShowSizeChange: (current,size) =>{
+                            obj.page = 1
+                            obj.limit = size
                             this.getApiCaseList(obj)
                         }
                     }}

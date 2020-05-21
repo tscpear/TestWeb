@@ -5,7 +5,7 @@ import {
     Card, Form, Input, Select, Button,
     Tag, Radio, Checkbox, Row, Col, Switch, message
 } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, NodeExpandOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
 import { addApiCaseData, updateApiCaseData } from '../../../api/index'
@@ -47,6 +47,7 @@ export default class CaseAddUpdate extends Component {
         },],
         relyTestMarkValue: null,
         relyTestIdValue: null,
+        deviceTypeDispaly: 'none',
     }
 
 
@@ -76,7 +77,7 @@ export default class CaseAddUpdate extends Component {
                 apiFiexdParamDisplay = 'block';
             }
         }
-        this.setState({ isRelyDisplay, headerRelyDisplay, webformRelyDisplay, bodyRelyDisplay,apiFiexdParamDisplay })
+        this.setState({ isRelyDisplay, headerRelyDisplay, webformRelyDisplay, bodyRelyDisplay, apiFiexdParamDisplay })
     }
 
     componentDidMount() {
@@ -93,7 +94,7 @@ export default class CaseAddUpdate extends Component {
 
         if (apiParamType == '3' || (apiParamType == "2" && !isDepend)) {
             this.setState({ apiFiexdParamDisplay: 'block' })
-            
+
         }
         const headerParamType = data.headerParamType;
         headerParamType.map(item => {
@@ -109,9 +110,9 @@ export default class CaseAddUpdate extends Component {
             if (item === '1') {
                 this.setState({ webformParamDisplay: 'block' })
             }
-            if (item === '3') {    
+            if (item === '3') {
                 this.setState({ webformHandleDisplay: 'inline-block' })
-            
+
             }
         })
         const bodyParamType = data.bodyParamType;
@@ -142,6 +143,10 @@ export default class CaseAddUpdate extends Component {
                 bodyRelyDisplay: 'none'
             })
         }
+        const device = data.device;
+        if (device == "2" || device == "4" || device == "3") {
+            this.setState({ deviceTypeDispaly: 'block' });
+        }
 
     }
     render() {
@@ -160,6 +165,7 @@ export default class CaseAddUpdate extends Component {
             headerRelyDisplay,
             webformRelyDisplay,
             bodyRelyDisplay,
+            deviceTypeDispaly,
 
         } = this.state;
 
@@ -334,7 +340,13 @@ export default class CaseAddUpdate extends Component {
             const user = memoryUtils.user;
             const data = this.props.location.state;
             const apiId = data.apiId;
+            const device = data.device;
+            if (device == "2" || device == "3" || device == "4") {
+            } else {
+                value.deviceType = device;
+            }
             let values = Object.assign(value, { "userId": user.id, 'apiId': apiId })
+
             let response;
             let result;
             if (data.id) {
@@ -343,7 +355,7 @@ export default class CaseAddUpdate extends Component {
                 result = response.data;
                 if (result.code == 1) {
                     this.props.history.goBack();
-                 
+
                 } else {
                     const msg = response.data.msg
                     message.error(msg)
@@ -353,7 +365,7 @@ export default class CaseAddUpdate extends Component {
                 result = response.data;
                 if (result.code == 1) {
                     this.props.history.goBack();
-                  
+
                 } else {
                     const msg = response.data.msg
                     message.error(msg)
@@ -383,28 +395,38 @@ export default class CaseAddUpdate extends Component {
             }
         }
 
+
         const deviceTypeList = () => {
-            const lists = [true, true, true, true, true, true, true]
+
             const data = this.props.location.state;
             const device = data.device
-            const list = data.deviceTypeList;
-            list.map(item => {
-                lists[item - 1] = false
-            })
+
+
             const store = (
                 <Radio.Group>
-                    <Radio value='1' disabled={lists[0]}><Tag color="magenta">网红授权/取货点/网红店旗下服务车</Tag></Radio>
-                    <Radio value='2' disabled={lists[1]}><Tag color="magenta">非授权门店</Tag></Radio>
-                    <Radio value='3' disabled={lists[2]}><Tag color="magenta">社会服务车</Tag></Radio>
-                    <Radio value='4' disabled={lists[3]}><Tag color="magenta">取货方门店</Tag></Radio>
-                    <Radio value='5' disabled={lists[4]}><Tag color="magenta">取货方门店下服务车</Tag></Radio>
-                    <Radio value='6' disabled={lists[5]}><Tag color="magenta">取货方社会服务车</Tag></Radio>
+                    <Radio value='2.1'><Tag color="magenta">网红授权/取货点/网红店旗下服务车</Tag></Radio>
+                    <Radio value='2.2'><Tag color="magenta">非授权门店</Tag></Radio>
+                    <Radio value='2.3'><Tag color="magenta">社会服务车</Tag></Radio>
+                    <Radio value='2.4'><Tag color="magenta">取货方门店</Tag></Radio>
+                    <Radio value='2.5'><Tag color="magenta">取货方门店下服务车</Tag></Radio>
+                    <Radio value='2.6'><Tag color="magenta">取货方社会服务车</Tag></Radio>
+                    <Radio value='2.7'><Tag color="magenta">13588096710</Tag></Radio>
+                </Radio.Group>
+            )
+            const driver = (
+                <Radio.Group>
+                    <Radio value='3.1'><Tag color="magenta">基础司机账号</Tag></Radio>
+                    <Radio value='3.2'><Tag color="magenta">13588096710</Tag></Radio>
                 </Radio.Group>
             )
 
             switch (device) {
                 case '2':
                     return store;
+                case '3':
+                    return driver;
+                case '4':
+                    return driver;
             }
         }
 
@@ -436,9 +458,11 @@ export default class CaseAddUpdate extends Component {
                     <Form.Item className='item' label='接口描述' name='apiMark'>
                         <Input className='do' disabled />
                     </Form.Item>
-                    <Form.Item className='itemss' label='角色类型' name='deviceType'>
-                        {deviceTypeList()}
-                    </Form.Item>
+                    <div style={{ display: deviceTypeDispaly, width: "100%" }}>
+                        <Form.Item className='itemss' label='角色类型' name='deviceType' >
+                            {deviceTypeList()}
+                        </Form.Item>
+                    </div>
                     <Form.Item className='item' label='用例描述' name='apiCaseMark' rules={rules}>
                         <Input className='do' />
                     </Form.Item>
@@ -463,15 +487,15 @@ export default class CaseAddUpdate extends Component {
                         </Form.Item>
                     </div>
                     <div style={{ display: isRelyDisplay, width: '100%' }}>
-                            <Form.Item label='选择依赖' className='itemss'>
-                                {frist('selectRelyCase')}
-                            </Form.Item>
-                        </div>
-                        <div style={{ display: apiFiexdParamDisplay, width: '100%' }}>
-                            <Form.Item label='接口传参' className='item' name='apiHandleParam'>
-                                <Input placeholder='请输入参数' className='do' />
-                            </Form.Item>
-                        </div>
+                        <Form.Item label='选择依赖' className='itemss'>
+                            {frist('selectRelyCase')}
+                        </Form.Item>
+                    </div>
+                    <div style={{ display: apiFiexdParamDisplay, width: '100%' }}>
+                        <Form.Item label='接口传参' className='item' name='apiHandleParam'>
+                            <Input placeholder='请输入参数' className='do' />
+                        </Form.Item>
+                    </div>
                     <div style={{ display: headerParamDisplay, width: '100%' }} >
                         <Form.Item label='头部参数' className='itemss'>
                             <div style={{ width: '45%', display: 'inline-block', verticalAlign: 'top' }}>
@@ -506,9 +530,7 @@ export default class CaseAddUpdate extends Component {
                     <div style={{ display: bodyParamDisplay, width: '100%' }} >
                         <Form.Item label='json参数' className='itemss'>
                             <div style={{ width: '45%', display: 'inline-block', verticalAlign: 'top', padding: '0px 35px 0px 0px' }}>
-
-
-                                <Form.Item style={{ paddingLeft: '2px' }} name='responseBase'>
+                                <Form.Item style={{ paddingLeft: '2px' }} name='bodyFiexdParam'>
                                     <Input.TextArea
                                         className='do'
                                         placeholder="返回值基本格式"
