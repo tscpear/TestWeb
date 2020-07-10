@@ -5,6 +5,8 @@ import { getApiUriList, getApiData, delApiData, getApiForCaseData } from '../../
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
+import { deviceNameOfList, deviceColorOfList, deviceSelect } from '../../../components/public'
+
 
 const Option = Select.Option
 
@@ -21,11 +23,13 @@ export default class UriHome extends Component {
             page: 1,
             apiPath: '',
             apiMark: '',
-            device: '0',
+            device: 0,
             limit: PAGE_SIZE
         },
         apiData: {},
     }
+
+
 
 
     //初始化所有的列
@@ -45,35 +49,9 @@ export default class UriHome extends Component {
                 align: "center",
                 width: 100,
                 render: device => {
-                    let color
-                    let value
-                    switch (device) {
-                        case '1':
-                            color = 'black';
-                            value = '知轮后台';
-                            break;
-                        case '2':
-                            color = 'green';
-                            value = '知轮商家';
-                            break;
-                        case '3':
-                            color = '#EE7621';
-                            value = '司机端程序';
-                            break;
-                        case '4':
-                            color = '#B23AEE';
-                            value = '知轮车服';
-                            break;
-                        case '5':
-                            color = '#FFBBFF';
-                            value = '分仓终端';
-                            break;
-                        default:
-                            break;
-                    }
                     return (
-                        <Tag color={color} key={value}>
-                            {value}
+                        <Tag color={deviceColorOfList(device)} key={device}>
+                            {deviceNameOfList(device)}
                         </Tag>
                     )
 
@@ -93,13 +71,13 @@ export default class UriHome extends Component {
                 render: apiMethod => {
                     let color
                     let value
-                    if (apiMethod === '1') {
+                    if (apiMethod === 1) {
                         color = '#2db7f5'
                         value = 'GET'
-                    } else if (apiMethod === '2') {
+                    } else if (apiMethod === 2) {
                         color = '#87d068'
                         value = 'POST'
-                    } else if (apiMethod === '3') {
+                    } else if (apiMethod === 3) {
                         color = '#108ee9'
                         value = 'PUT'
                     }
@@ -259,7 +237,7 @@ export default class UriHome extends Component {
     }
     clear = () => {
         const { obj } = this.state
-        obj.device = '0'
+        obj.device = 0
         obj.apiPath = ''
         obj.apiMark = ''
         this.setState({ obj: obj })
@@ -273,19 +251,8 @@ export default class UriHome extends Component {
         const title = (
             <span>
                 <Select style={{ width: 150 }} value={obj.device} onChange={this.deviceChange}>
-                    <Option value='0'>请选择设备</Option>
-                    <Option value='1'>知轮后台</Option>
-                    <Option value='2'>知轮商家</Option>
-                    <Option value='3'>车服小程序</Option>
-                    <Option value='4'>知轮车服</Option>
-                    <Option value='5'>分仓终端</Option>
-                    <Option value='6'>商城后台</Option>
-                    <Option value='7'>店铺后台</Option>
-                    <Option value='8'>知轮三包</Option>
-                    <Option value='9'>知轮通</Option>
-                    <Option value='10'>知轮互联</Option>
-                    <Option value='11'>车服H5</Option>
-                    <Option value='12'>知轮车队</Option>
+                    <Select.Option value={0}>请选择设备</Select.Option>
+                    {deviceSelect()}
                 </Select>
                 <Input style={{ width: 200, margin: "0 15px" }} placeholder='路径' value={obj.apiPath} onChange={event => this.apiPathChange(event)} className='do'>
                 </Input>

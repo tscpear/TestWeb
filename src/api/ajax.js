@@ -5,23 +5,40 @@
  */
 import axios from 'axios'
 import {message} from 'antd'
-export default function ajax(url, data = {}, type = 'GET') {
+import storageUtils from '../utils/storageUtils'
+export default function ajax(url, data = {}, type) {
     
     return new Promise((resolve, reject) => {
-        let promise
+        let promise;
+        const projectId = storageUtils.getProjectId();
+        
+    
+        
+        
         //执行异步ajax请求
-        if (type === 'GET') {
-            promise = axios.get(url, {
-                params: data
-            })
-        } else {
-            promise = axios.post(url, data)
-        }
+    
+        // if (type === 'GET') {
+        //     promise = axios.get(url, {
+        //         params: data
+        //     ,headers:{'projectId':projectId}
+        // })
+        // } else {
+        //     promise = axios.post(url, {
+        //         data: data,
+        //         headers:{'projectId':projectId}
+        // })
+        // }
+        promise = axios({
+            method: type,
+            url: url,
+            data: data,
+            headers:{'projectId':projectId}
+         
+        })
           //如果成功了，调用resolve（value）
         promise.then(response =>{
             resolve(response)
         }).catch(error =>{
-            console.log('你妈妈吗')
             message.error('请求出错了：' + error.message)
         })
       

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import './login.less'
-import { Form, Input, Button, Checkbox, message } from 'antd'
-import { UserOutlined, LockOutlined } from '@ant-design/icons'
-import { reqLogin } from '../../api'
+import { Form, Input, Button, Checkbox, message, Select, Divider } from 'antd'
+import { UserOutlined, LockOutlined, PlusOutlined } from '@ant-design/icons'
+import { reqLogin, getProjectList } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
 import storageUtils from '../../utils/storageUtils'
 import { Redirect } from 'react-router-dom'
@@ -11,30 +11,65 @@ import { Redirect } from 'react-router-dom'
  * 登录的路由组件
  */
 export default class Login extends Component {
+
+    state = {
+        items: ['jack', 'lucy'],
+    }
+
+
+
+    getProjectList = async () => {
+        const response = await getProjectList()
+        const result = response.data;
+        if (result.code == 1) {
+            this.setState({items:result.data})
+        }
+    }
+    componentWillMount() {
+        this.getProjectList()
+    }
+    selectProject=(value)=>{
+        this.setState({projectId:value})
+    }
     render() {
         //判断是否已经登入
 
         const user = memoryUtils.user
         if (user.userId) {
             return <Redirect to='/' />
+        } else {
+           
         }
+      
 
         const onFinish = async values => {
+           const projectId = this.state.projectId;
             const { username, password } = values
-            const response = await reqLogin(username, password)
+            const response = await reqLogin(username, password,projectId)
             const result = response.data
             if (result.code === 1) {
                 message.success('登入成功')
                 const user = result.user
+                const projectId = result.projectId;
+                const environment = result.environment;
+                const projectName = result.projectName;
+                const deviceList = result.device;
+                memoryUtils.projectId = projectId
+                storageUtils.saveData('project_id_key',projectId)
                 memoryUtils.user = user
-                storageUtils.saveUser(user)
+                storageUtils.saveData('user_key',user);
+                storageUtils.saveData('environment_key',environment);
+                storageUtils.saveData('project_name_key',projectName);
+                storageUtils.saveData('device_list_key',deviceList)
                 this.props.history.replace('/')
             } else {
                 message.error(result.msg)
             }
         }
-
+        const { items, name } = this.state;
         return (
+
+
             <div className='login'>
                 <header className='login-header'></header>
                 <section className='login-content'>
@@ -49,10 +84,40 @@ export default class Login extends Component {
                     </div>
                     <div className='login-form-title'>
                         <div className='login-form-title-left'>
-                            <h3>登入窗口</h3>
-                            <p>请输入您的账号与密码:</p>
+                            <div>
+                                <h3>阿尼赛哟</h3>
+                                {/* <p>请输入您的账号与密码:</p> */}
+                            </div>
+
+                        </div>
+                        <div className='login-form-title-right'>
+                            <Select
+                                onChange={this.selectProject}
+                                style={{ width: 240 }}
+                                placeholder="请选择对应的项目"
+                                dropdownRender={menu => (
+                                    <div>
+                                        {menu}
+                                        <Divider style={{ margin: '4px 0' }} />
+                                        <div style={{ display: 'flex', flexWrap: 'nowrap', padding: 8 }}>
+                                            <Input style={{ flex: 'auto' }} />
+                                            <a
+                                                style={{ flex: 'none', padding: '8px', display: 'block', cursor: 'pointer' }}
+                                                onClick={this.addItem}
+                                            >
+                                                <PlusOutlined /> Add item
+              </a>
+                                        </div>
+                                    </div>
+                                )}
+                            >
+                                {items.map(item => (
+                                    <Select.Option key={item.id}>{item.name}</Select.Option>
+                                ))}
+                            </Select>
                         </div>
                     </div>
+
                     <div className='login-form-myself'>
                         <Form
                             name='normal_login'

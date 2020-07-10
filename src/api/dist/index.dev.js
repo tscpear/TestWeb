@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.crateDataTire = exports.getOneReport = exports.doTest = exports.putToken = exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiHomeList = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
+exports.getProjectList = exports.getReportResultTable = exports.crateDataTire = exports.getOneReport = exports.doTest = exports.putToken = exports.getApiGroupList = exports.searchTestName = exports.searchTest = exports.getApiHomeList = exports.getApiReport = exports.delApiCaseData = exports.addApiCaseData = exports.updateApiCaseData = exports.getApiCaseData = exports.getApiCaseList = exports.getApiForCaseData = exports.delApiData = exports.updateApiData = exports.addApiData = exports.getApiData = exports.getApiUriList = exports.reqLogin = void 0;
 
 var _ajax = _interopRequireDefault(require("./ajax"));
 
@@ -15,10 +15,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 // export function reqLogin(){
 //     ajax('/login',{username,password},'POST')
 // }
-var reqLogin = function reqLogin(username, password) {
+var reqLogin = function reqLogin(username, password, projectId) {
   return (0, _ajax["default"])('/login', {
     username: username,
-    password: password
+    password: password,
+    projectId: projectId
   }, 'POST');
 };
 
@@ -176,3 +177,15 @@ var crateDataTire = function crateDataTire(value, environment) {
 };
 
 exports.crateDataTire = crateDataTire;
+
+var getReportResultTable = function getReportResultTable(obj) {
+  return (0, _ajax["default"])("/report/reportList", obj, "POST");
+};
+
+exports.getReportResultTable = getReportResultTable;
+
+var getProjectList = function getProjectList() {
+  return (0, _ajax["default"])("/project", {}, "GET");
+};
+
+exports.getProjectList = getProjectList;

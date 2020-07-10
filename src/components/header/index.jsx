@@ -46,7 +46,7 @@ class Header extends Component {
             icon: <ExclamationCircleOutlined />,
             content: '是否退出登入',
             onOk() {
-                storageUtil.removeUser()
+                storageUtil.removeData("user_key");
                 memoryUtils.user = {}
                 props.history.replace('/login')
             },
@@ -57,15 +57,15 @@ class Header extends Component {
 
     render() {
         const title = this.getTitle()
-        const userName = memoryUtils.user.username
+        const projectName = storageUtil.getData('project_name_key');
         return (
             <div className='header' >
                 <div className='header-left'>
                     <span>{title}</span>
                 </div>
                 <div className='header-right'>
-                    <span>欢迎您，{userName}！</span>
-                    <a onClick={this.logout}>退出</a>
+                    <span>项目名称：{projectName}</span>
+                    <a style={{margin:'0px 20px'}} onClick={this.logout}>退出</a>
                 </div>
 
             </div>

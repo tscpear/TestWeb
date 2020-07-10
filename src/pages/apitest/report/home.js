@@ -39,6 +39,10 @@ export default class ReportHome extends Component {
                 key: 'createTime',
                 width: 200,
                 align: "center",
+                render:(createTime)=>{
+                    var dateee = new Date(createTime).toJSON();
+                    return new Date(+new Date(dateee)).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') 
+                }
             },
             {
                 title: '成功率',
@@ -54,7 +58,7 @@ export default class ReportHome extends Component {
                 width: 100,
                 render: (apiList) => {
                     return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={() => this.goReportList(apiList)}><FileSearchOutlined /></a>
+                        <a style={{ padding: "0 5px" }}  onClick={() => this.props.history.push('/apitest/case/dotest', apiList.id)}><FileSearchOutlined /></a>
                     </div>)
 
                 }

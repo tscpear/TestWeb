@@ -5,6 +5,7 @@ import { getApiCaseData, getApiCaseList, delApiCaseData } from '../../../api/ind
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
+import { deviceNameOfList, deviceColorOfList, deviceSelect } from '../../../components/public'
 
 const Option = Select.Option
 
@@ -70,35 +71,9 @@ export default class ApiCaseHome extends Component {
                 align: "center",
                 width: 100,
                 render: device => {
-                    let color
-                    let value
-                    switch (device) {
-                        case '1':
-                            color = 'black';
-                            value = '知轮后台';
-                            break;
-                        case '2':
-                            color = 'green';
-                            value = '知轮商家';
-                            break;
-                        case '3':
-                            color = '#EE7621';
-                            value = '司机端程序';
-                            break;
-                        case '4':
-                            color = '#B23AEE';
-                            value = '知轮车服';
-                            break;
-                             case '5':
-                            color = '#FFBBFF';
-                            value = '分仓终端';
-                            break;
-                        default:
-                            break;
-                    }
                     return (
-                        <Tag color={color} key={value}>
-                            {value}
+                        <Tag color={deviceColorOfList(device)} key={device}>
+                            {deviceNameOfList(device)}
                         </Tag>
                     )
 
@@ -282,7 +257,7 @@ export default class ApiCaseHome extends Component {
     }
     onSelectChange = selectedRowKeys => {
         const { apiCaseList } = this.state;
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRowKeys changed: ', selectedRowKeys); 
         let selectedTestId = [];
         selectedRowKeys.map(item => {
             selectedTestId.push(apiCaseList[item].id)
@@ -299,18 +274,7 @@ export default class ApiCaseHome extends Component {
             <span>
                 <Select style={{ width: 150 }} value={obj.device} onChange={this.deviceChange}>
                     <Option value='0'>请选择设备</Option>
-                    <Option value='1'>知轮后台</Option>
-                    <Option value='2'>知轮商家</Option>
-                    <Option value='3'>车服小程序</Option>
-                    <Option value='4'>知轮车服</Option>
-                    <Option value='5'>分仓终端</Option>
-                    <Option value='6'>商城后台</Option>
-                    <Option value='7'>店铺后台</Option>
-                    <Option value='8'>知轮三包</Option>
-                    <Option value='9'>知轮通</Option>
-                    <Option value='10'>知轮互联</Option>
-                    <Option value='11'>车服H5</Option>
-                    <Option value='12'>知轮车队</Option>
+                    {deviceSelect()}
                 </Select>
                 <Input style={{ width: 200, margin: "0 15px" }} placeholder='路径' value={obj.apiPath} onChange={event => this.apiPathChange(event)} className='do'>
                 </Input>

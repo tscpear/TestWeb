@@ -6,7 +6,9 @@ import {
 } from 'antd'
 import { LockOutlined, SendOutlined, SyncOutlined, FileSearchOutlined, ItalicOutlined, PlusOutlined, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { PAGE_SIZE } from '../../../utils/constants'
-import { getApiReport, putToken, doTest, getOneReport } from '../../../api/index'
+import { getApiReport, putToken, doTest, getOneReport, getReportResultTable, getAccountList } from '../../../api/index'
+import storageUtils from '../../../utils/storageUtils'
+import { deviceNameOfList, deviceColorOfList, deviceSelect } from '../../../components/public'
 
 const DescriptionItem = ({ title, content }) => (
     <div className="site-description-item-profile-wrapper">
@@ -33,7 +35,7 @@ export default class DoTest extends Component {
         apiReport: [],
         testList: [],
         groupId: 0,
-        environment: "uat",
+        environment: 1,
         visible: false,
         requestData: {
             apiPath: "asdqweqe",
@@ -41,7 +43,13 @@ export default class DoTest extends Component {
             webformParam: [],
             bodyParam: [],
 
-        }
+        },
+        responseValueExpectResult: [],
+        reportId: 0,
+        dotestName: '执行用例',
+        account: [],
+        accountValue: [],
+
     };
 
 
@@ -70,37 +78,11 @@ export default class DoTest extends Component {
                 dataIndex: 'device',
                 key: 'device',
                 align: "center",
-                width: 80,
+                width: 100,
                 render: device => {
-                    let color
-                    let value
-                    switch (device) {
-                        case '1':
-                            color = 'black';
-                            value = '知轮后台';
-                            break;
-                        case '2':
-                            color = 'green';
-                            value = '知轮商家';
-                            break;
-                        case '3':
-                            color = '#EE7621';
-                            value = '司机端程序';
-                            break;
-                        case '4':
-                            color = '#B23AEE';
-                            value = '知轮车服';
-                            break;
-                        case '5':
-                            color = '#FFBBFF';
-                            value = '分仓终端';
-                            break;
-                        default:
-                            break;
-                    }
                     return (
-                        <Tag color={color} key={value}>
-                            {value}
+                        <Tag color={deviceColorOfList(device)} key={device}>
+                            {deviceNameOfList(device)}
                         </Tag>
                     )
 
@@ -112,6 +94,17 @@ export default class DoTest extends Component {
                 key: 'deviceType',
                 width: 200,
                 align: "center",
+                render: (deviceType,data) => {
+                    const account = this.state.account;
+                    if (account.length > 0) {
+                        return (account.map((item) => {
+                           if(item.device == data.device && item.deviceType == data.deviceType){
+                                return item.deviceTypeName
+                           }
+                        }))
+                    }
+
+                }
             },
             {
                 title: '路径',
@@ -119,23 +112,35 @@ export default class DoTest extends Component {
                 key: 'apiPath',
             },
             {
-                title: '描述',
-                dataIndex: 'apiCaseMark',
-                key: 'apiCaseMark',
+                title: '状态码',
+                dataIndex: 'actStatus',
+                key: 'actStatus',
             },
             {
                 title: '执行结果',
-                dataIndex: 'resultStatus',
-                key: 'resultStatus',
+                dataIndex: 'resultMain',
+                key: 'resultMain',
                 align: "center",
-                render: (resultStatus, apiReport) => {
-                    if (resultStatus != null) {
-                        if (resultStatus == 1) {
+                render: (resultMain, apiReport) => {
+                    if (resultMain != null) {
+                        if (resultMain == 0) {
                             return (
                                 <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><CheckCircleTwoTone twoToneColor="#52c41a" /></a>)
-                        } else {
+                        } else if (resultMain == 1) {
                             return (
-                                <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><CloseCircleTwoTone twoToneColor="red" /></a>);
+                                <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}> <Tag color="red">
+                                    状态码与期望不一致
+                                </Tag></a>);
+                        } else if (resultMain == 2) {
+                            return (
+                                <a style={{ padding: "0 5px", color: "red" }} onClick={() => this.showDrawer(apiReport)}><Tag color="red">
+                                    返回结构与期望不一致
+                               </Tag></a>);
+                        } else if (resultMain == 3) {
+                            return (
+                                <a style={{ padding: "0 5px", color: "red" }} onClick={() => this.showDrawer(apiReport)}><Tag color="red">
+                                    返回值与期望不一致
+                               </Tag></a>);
                         }
                     }
 
@@ -143,18 +148,19 @@ export default class DoTest extends Component {
 
 
             },
-            // {
-            //     title: '操作',
-            //     align: 'center',
-            //     key: 'action',
-            //     width: 100,
-            //     render: (apiReport) => {
-            //         return (<div >
-            //             <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
-            //         </div>)
 
-            //     }
-            // }
+            {
+                title: '操作',
+                align: 'center',
+                key: 'action',
+                width: 100,
+                render: (apiReport) => {
+                    return (<div >
+                        <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
+                    </div>)
+
+                }
+            }
         ]
 
     }
@@ -170,23 +176,53 @@ export default class DoTest extends Component {
         let tokenData
         const testIdList = this.props.location.state;
         if (typeof testIdList === "number") {
-            tokenData = { "testList": [], "groupId": testIdList }
-        } else {
-            tokenData = { "testList": testIdList, "groupId": 0 }
-        }
+            if (testIdList < 10000) {
+                tokenData = { "testList": [], "groupId": testIdList, "reportId": 0 }
+            } else {
+                tokenData = { "testList": [], "groupId": 0, "reportId": testIdList }
+                this.setState({ dotestName: '重新执行' });
+            }
 
+        } else {
+            tokenData = { "testList": testIdList, "groupId": 0, "reportId": 0 }
+        }
         this.setState({ tokenData });
-        this.getApiReport(tokenData)
+        this.getApiReport(tokenData);
+        this.getAccount(tokenData);
+    }
+
+    getAccount = async (tokenData) => {
+        const { environment, reportId } = this.state;
+        if (reportId != 0) {
+            tokenData.reportId = reportId;
+        }
+        let value = Object.assign(tokenData, { "environment": environment });
+        var response = await getAccountList(value)
+        var result = response.data;
+        var account = result.data;
+
+        var accountValue = [];
+        account.map((item, index) => {
+            accountValue[index] = item.device + '.' + item.deviceType + '.' + 1
+        });
+        this.setState({ account, accountValue })
+
     }
 
 
     getApiReport = async (tokenData) => {
         this.setState({ loading: true })
-        const response = await getApiReport(tokenData)
+        var response;
+        if (tokenData.reportId > 10000) {
+            response = await getReportResultTable(tokenData);
+        } else {
+            response = await getApiReport(tokenData)
+        }
+
         this.setState({ loading: false })
         const result = response.data
         if (result.code === 1) {
-            const apiReport = result.data
+            const apiReport = result.data.list;
             const count = result.count
             apiReport.map((item, index) => {
                 item.key = index
@@ -194,7 +230,7 @@ export default class DoTest extends Component {
             //更新状态
             this.setState({
                 apiReport,
-                total: count
+                total: count,
             })
         } else {
             const msg = result.msg
@@ -207,8 +243,9 @@ export default class DoTest extends Component {
         this.setState({ environment: value })
     }
     putToken = async () => {
-        const { environment, tokenData } = this.state;
-        let value = Object.assign(tokenData, { "environment": environment });
+        const { environment, accountValue } = this.state;
+
+        let value = { "environment": environment, "accountValue": accountValue };
         this.setState({ loading: true })
         const response = await putToken(value)
         this.setState({ loading: false })
@@ -223,8 +260,11 @@ export default class DoTest extends Component {
         }
     }
     doTest = async () => {
-        const { environment, tokenData } = this.state;
-        let value = Object.assign(tokenData, { "environment": environment });
+        const { environment, tokenData, reportId, accountValue } = this.state;
+        if (reportId != 0) {
+            tokenData.reportId = reportId;
+        }
+        let value = Object.assign(tokenData, { "environment": environment, "accountValue": accountValue });
         this.setState({ loading: true })
         const response = await doTest(value)
         this.setState({ loading: false })
@@ -234,12 +274,15 @@ export default class DoTest extends Component {
 
         if (result.code === 1) {
             const data = result.data;
-            this.setState({ apiReport: data })
+            const list = data.list;
+            const reportId = data.reportId;
+            this.setState({ apiReport: list, reportId: reportId, dotestName: '重新执行' })
             message.success(msg);
         } else {
             message.error(msg)
         }
     }
+
 
     showDrawer = async (apiReport) => {
         await this.getOneReport(apiReport.id);
@@ -266,6 +309,15 @@ export default class DoTest extends Component {
         }
 
     };
+    /**
+     * 修改测试账户的方法
+     * @param {*} json 
+     */
+    onChangeAccount = (value, device, deviceType, index) => {
+        const accountValue = this.state.accountValue;
+        accountValue[index] = device + '.' + deviceType + '.' + value
+        this.setState({ accountValue })
+    }
 
     /**
      * json展示方法
@@ -294,32 +346,25 @@ export default class DoTest extends Component {
 
     render() {
 
-        const { data, apiReport, total, loading, obj, requestData } = this.state;
+        const { data, apiReport, total, loading, obj, requestData, responseValueExpectResult, dotestName, account } = this.state;
+        const environmentItem = storageUtils.getData('environment_key')
 
 
 
-        const phoneList = (item) => {
-            let device;
-            let deviceType;
-            let phone = item[2];
-            switch (item[0]) {
-                case '1':
-                    device = '管理后台';
-                    break;
-                case '2':
-                    device = '知轮商家';
-                    break;
-            }
-            switch (item[1]) {
-                case '1':
-                    deviceType = '网红/取货点/服务车';
-                    break;
-            }
+
+        const phoneList = (item, index) => {
+
             return (
-                <div >
-                    <div style={{ display: 'inline-block', width: '20%' }}>{device}</div>
-                    <div style={{ display: 'inline-block', width: '50%' }}>{deviceType}</div>
-                    <div style={{ display: 'inline-block', width: '20%' }}>{phone}</div>
+                <div style={{ margin: '10px 0px' }}>
+                    <div style={{ display: 'inline-block', width: '20%' }}>{item.deviceName}</div>
+                    <div style={{ display: 'inline-block', width: '30%' }}>{item.deviceTypeName}</div>
+                    <div style={{ display: 'inline-block', width: '50%' }}>
+                        <Select autoFocus='true' style={{ width: '200px' }} defaultValue={1} onChange={(value) => this.onChangeAccount(value, item.device, item.deviceType, index)}>
+                            {item.accountList.map((item, index) => (
+                                <Select.Option value={index + 1}>{item}</Select.Option>
+                            ))}
+                        </Select>
+                    </div>
                 </div>
             )
         }
@@ -329,21 +374,16 @@ export default class DoTest extends Component {
         const extra = (
             <div>
                 <Button type='primary' onClick={this.showModal} style={{ backgroundColor: '#9BCD9B', border: '1px solid #9BCD9B' }}>
-                    <SyncOutlined spin />涉及账号
+                    <SyncOutlined spin />账号与环境
                  </Button>
-                <Button type='primary' style={{ backgroundColor: 'orange', border: '1px solid orange', margin: '0px 20px' }} onClick={this.putToken}>
-                    <LockOutlined />固定token
-                </Button>
-                <Select autoFocus='true' style={{ width: '100px' }} defaultValue='uat' onChange={this.environmentOnChange}>
-                    <Select.Option value='uat'>准生产</Select.Option>
-                    <Select.Option value='tests'>测试次</Select.Option>
-                    <Select.Option value='test'>测试主</Select.Option>
-                </Select>
+
+                <Input style={{ width: '100px', margin: '0px 0px 0px 20px' }} value={environmentItem[this.state.environment - 1]} />
                 <Button type='primary' style={{ marginLeft: '20px' }} onClick={this.doTest}>
-                    <SendOutlined />执行用例
+                    <SendOutlined />{dotestName}
                 </Button>
+
                 <Modal
-                    title="涉及账号"
+                    title="账号与环境"
                     visible={this.state.Modalvisible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -353,9 +393,21 @@ export default class DoTest extends Component {
                     onOk={this.hideModal}
                     onCancel={this.hideModal}
                 >
-                    {data.map(item => {
-                        return phoneList(item);
-                    })}
+                    <div>
+                        <Select autoFocus='true' style={{ width: '100px' }} defaultValue={1} onChange={this.environmentOnChange}>
+                            {environmentItem.map((item, index) => (
+                                <Select.Option value={index + 1}>{item}</Select.Option>
+                            ))}
+                        </Select>
+                    </div>
+                    <div style={{ margin: '20px 0px 0px 0px' }}>
+                        {account.map((item, index) => {
+                            return phoneList(item, index);
+                        })}
+                    </div>
+                    <Button type='primary' style={{ backgroundColor: 'orange', border: '1px solid orange' }} onClick={this.putToken}>
+                        <LockOutlined />固定token
+                </Button>
                 </Modal>
             </div>
 
@@ -373,6 +425,23 @@ export default class DoTest extends Component {
                 key: 'value',
             },
         ];
+        const expectColumns = [
+            {
+                title: '路径',
+                dataIndex: 'path',
+                key: 'path',
+            },
+            {
+                title: '期望值',
+                dataIndex: 'expectValue',
+                key: 'expectValue',
+            },
+            {
+                title: '实际值',
+                dataIndex: 'actValue',
+                key: 'actValue',
+            },
+        ];
         const showTotal = (total, range) => {
 
             return "共 " + total + " 条"
@@ -386,26 +455,10 @@ export default class DoTest extends Component {
                     loading={loading}
                     bordered
                     size="small"
-                // pagination={{
-                //     pageSizeOptions:['10', '20', '50', '100','200','500','1000','5000'],
-                //     defaultPageSize: PAGE_SIZE,
-                //     total: total,
-                //     showTotal:showTotal,
-                //     showSizeChanger:true,
-                //     onChange: (pageNum) => {
-                //         obj.page = pageNum
-                //         obj.limit = PAGE_SIZE
-                //         this.getApiReport(obj)
-                //     },
-                //     onShowSizeChange: (current,size) =>{
-                //         obj.page = 1
-                //         obj.limit = size
-                //         this.getApiReport(obj)
-                //     }
-                // }}
+
                 />
                 <Drawer
-                    width={640}
+                    width={'60%'}
                     placement="right"
                     closable={false}
                     onClose={this.onClose}
@@ -438,6 +491,29 @@ export default class DoTest extends Component {
                         </Collapse.Panel>
                         <Collapse.Panel header="body参数" key="3" showArrow={false}>
                             <pre><code id="json">  {JSON.stringify(requestData.bodyParam, undefined, 2)}</code></pre>
+                        </Collapse.Panel>
+                    </Collapse>
+                    <Divider style={{ backgroundColor: "green" }} />
+                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 期望断言</p>
+                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                        <Collapse.Panel header="状态码期望值" key="1" showArrow={false}>
+                            <Row>
+                                <Col span={12}>
+                                    <DescriptionItem title="期望状态码" content={requestData.expectStatus} />
+                                </Col>
+                                <Col span={12}>
+                                    <DescriptionItem title="实际状态码" content={requestData.actStatus} />
+                                </Col>
+                            </Row>
+                        </Collapse.Panel>
+                        <Collapse.Panel header="返回值期望" key="2" showArrow={false}>
+                            <Table
+                                columns={expectColumns}
+                                dataSource={requestData.responseValueExpectResult}
+                                size="small"
+                                pagination={false}>
+
+                            </Table>
                         </Collapse.Panel>
                     </Collapse>
                     <Divider style={{ backgroundColor: "green" }} />

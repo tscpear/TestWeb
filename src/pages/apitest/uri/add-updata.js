@@ -8,6 +8,7 @@ import {
 import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
+import { deviceSelect } from '../../../components/public'
 
 
 export default class AddUpdata extends Component {
@@ -15,8 +16,8 @@ export default class AddUpdata extends Component {
         //展示控制器
         apiData: {
             "apiParamType": "0",
-            "apiRelyParamName": null,
-            "apiRelyParamValue": null,
+            "apiRelyParamName": undefined,
+            "apiRelyParamValue": undefined,
             "headerParamType": [],
             "headerHandleParam": [],
             "webformParamType": [],
@@ -57,6 +58,8 @@ export default class AddUpdata extends Component {
         webformRelySearchName: [],
         bodyRelySearch: [],
         bodyRelySearchName: [],
+        apiRelySearchValue: undefined,
+        device: 0,
 
     }
     //接口参数的点击展示控制器
@@ -153,6 +156,7 @@ export default class AddUpdata extends Component {
 
     componentDidMount = () => {
         const apiData = this.props.location.state;
+        this.setState({device:apiData.device});
         if (apiData && apiData.id) {
             this.setState({ title: "编   辑" });
             this.headerParamTypeOnChange(apiData.headerParamType);
@@ -205,36 +209,42 @@ export default class AddUpdata extends Component {
         const data = result.data;
         if (addName === 'header依赖参数') {
             this.setState({ headerRelySearch: data })
-        }else  if (addName === 'webform依赖参数') {
+        } else if (addName === 'webform依赖参数') {
             this.setState({ webformRelySearch: data })
-        }else  if (addName === 'body依赖参数') {
+        } else if (addName === 'body依赖参数') {
             this.setState({ bodyRelySearch: data })
         } else {
             this.setState({ apiRelySearch: data });
         }
 
     }
-    searchTestName = async (value, addName,index) => {
-        const response = await searchTestName(value);
-        const result = response.data;
-        const data = result.data;
-        if (addName === 'header依赖参数') {
-            let headerRelySearchName = this.state.headerRelySearchName;
-            let headerRelySearchNameObject=Object.assign({"index":index,"value":data});
-            headerRelySearchName.push(headerRelySearchNameObject);
-            this.setState({ headerRelySearchName})
-        } else if (addName === 'webform依赖参数') {
-            let webformRelySearchName = this.state.headerRelySearchName;
-            let webformRelySearchNameObject=Object.assign({"index":index,"value":data});
-            webformRelySearchName.push(webformRelySearchNameObject);
-            this.setState({ webformRelySearchName})
-        } else if (addName === 'body依赖参数') {
-            let bodyRelySearchName = this.state.headerRelySearchName;
-            let bodyRelySearchNameObject=Object.assign({"index":index,"value":data});
-            bodyRelySearchName.push(bodyRelySearchNameObject);
-            this.setState({bodyRelySearchName})
+    searchTestName = async (value, addName, index) => {
+        const device = this.state.device;
+        if (device == 0) {
+
         } else {
-            this.setState({ apiRelySearchName: data })
+            const response = await searchTestName(value,device);
+            const result = response.data;
+            const data = result.data;
+            if (addName === 'header依赖参数') {
+                let headerRelySearchName = this.state.headerRelySearchName;
+                let headerRelySearchNameObject = Object.assign({ "index": index, "value": data });
+                headerRelySearchName.push(headerRelySearchNameObject);
+                this.setState({ headerRelySearchName })
+            } else if (addName === 'webform依赖参数') {
+                let webformRelySearchName = this.state.headerRelySearchName;
+                let webformRelySearchNameObject = Object.assign({ "index": index, "value": data });
+                webformRelySearchName.push(webformRelySearchNameObject);
+                this.setState({ webformRelySearchName })
+            } else if (addName === 'body依赖参数') {
+                let bodyRelySearchName = this.state.headerRelySearchName;
+                let bodyRelySearchNameObject = Object.assign({ "index": index, "value": data });
+                bodyRelySearchName.push(bodyRelySearchNameObject);
+                this.setState({ bodyRelySearchName })
+            } else {
+                this.setState({ apiRelySearchName: data })
+            }
+
         }
 
     }
@@ -254,8 +264,8 @@ export default class AddUpdata extends Component {
         }
     };
 
-    secondRelyChange = (value, addName,index) => {
-        this.searchTestName(value, addName,index);
+    secondRelyChange = (value, addName, index) => {
+        this.searchTestName(value, addName, index);
     };
 
     render() {
@@ -313,19 +323,19 @@ export default class AddUpdata extends Component {
 
 
         //一级方法
-        const frist = (name, fristPlaceholder, secondPlaceholder, addName,display) => {
-            const rules =() =>{
+        const frist = (name, fristPlaceholder, secondPlaceholder, addName, display) => {
+            const rules = () => {
                 let required = true;
-                if(display=="none"){
+                if (display == "none") {
                     required = false;
                 }
-                let rule =[{
+                let rule = [{
                     required: required,
                     whitespace: true,
                     message: "咋不填呢",
                 }]
                 return rule;
-            } ;
+            };
             return (
                 <Form.List name={name} >
                     {(fields, { add, remove }) => {
@@ -381,19 +391,19 @@ export default class AddUpdata extends Component {
         }
 
         //二级方法
-        const second = (name, fristPlaceholder, secondPlaceholder, threePlaceholder, addName,display) => {
-            const rules =() =>{
+        const second = (name, fristPlaceholder, secondPlaceholder, threePlaceholder, addName, display) => {
+            const rules = () => {
                 let required = true;
-                if(display=="none"){
+                if (display == "none") {
                     required = false;
                 }
-                let rule =[{
+                let rule = [{
                     required: required,
                     whitespace: true,
                     message: "咋不填呢",
                 }]
                 return rule;
-            } ;
+            };
 
             const relyOptions = (addName) => {
                 if (addName === 'header依赖参数') {
@@ -408,19 +418,19 @@ export default class AddUpdata extends Component {
                 }
             }
 
-            const nameOptions = (addName,index) => {
+            const nameOptions = (addName, index) => {
                 if (addName === 'header依赖参数') {
                     let option;
                     this.state.headerRelySearchName.map(item => {
-                        if(item.index == index){
-                            option =  item.value.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                        if (item.index == index) {
+                            option = item.value.map(item => <Select.Option key={item}>{item}</Select.Option>);
                         }
                     });
                     return option;
-                }else  if (addName === 'webform依赖参数') {
+                } else if (addName === 'webform依赖参数') {
                     const option = this.state.webformRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
                     return option;
-                }else  if (addName === 'body依赖参数') {
+                } else if (addName === 'body依赖参数') {
                     const option = this.state.bodyRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
                     return option;
                 }
@@ -446,7 +456,7 @@ export default class AddUpdata extends Component {
                                                     filterOption={false}
                                                     placeholder={threePlaceholder}
                                                     onSearch={value => this.secondRelySearch(value, addName)}
-                                                    onChange={value => this.secondRelyChange(value, addName,index)}
+                                                    onChange={value => this.secondRelyChange(value, addName, index)}
                                                     notFoundContent={null}
                                                 >
                                                     {relyOptions(addName)}
@@ -476,7 +486,7 @@ export default class AddUpdata extends Component {
                                                     placeholder={secondPlaceholder}
                                                     notFoundContent={null}
                                                 >
-                                                    {nameOptions(addName,index)}
+                                                    {nameOptions(addName, index)}
                                                 </Select>
                                             </Form.Item>
                                         </Col>
@@ -538,28 +548,17 @@ export default class AddUpdata extends Component {
                     <Form.Item className='item' label='接口描述' name='apiMark' rules={rules}>
                         <Input className='do' />
                     </Form.Item>
-                    <Form.Item className='item' label='设备终端' name='device' rules={rules} >
-                        <Select autoFocus={true} style={{ width: '200px' }}>
-                            <Select.Option value='0'>请选择设备</Select.Option>
-                            <Select.Option value='1'>知轮后台</Select.Option>
-                            <Select.Option value='2'>知轮商家</Select.Option>
-                            <Select.Option value='3'>司机端小程序</Select.Option>
-                            <Select.Option value='4'>知轮车服</Select.Option>
-                            <Select.Option value='5'>分仓终端</Select.Option>
-                            <Select.Option value='6'>商城后台</Select.Option>
-                            <Select.Option value='7'>店铺后台</Select.Option>
-                            <Select.Option value='8'>知轮三包</Select.Option>
-                            <Select.Option value='9'>知轮通</Select.Option>
-                            <Select.Option value='10'>知轮互联</Select.Option>
-                            <Select.Option value='11'>车服H5</Select.Option>
-                            <Select.Option value='12'>知轮车队</Select.Option>
+                    <Form.Item className='item' label='设备终端' name='device'>
+                        <Select autoFocus={true} style={{ width: '200px' }} onChange={(value) => this.setState({ device: value })}>
+                            <Select.Option value={0}>请选择设备</Select.Option>
+                            {deviceSelect()}
                         </Select>
                     </Form.Item>
-                    <Form.Item className='item' label='请求方式' name='apiMethod' rules={rules}>
+                    <Form.Item className='item' label='请求方式' name='apiMethod'>
                         <Radio.Group>
-                            <Radio value='1'><Tag color="gold">GET</Tag></Radio>
-                            <Radio value='2'><Tag color="purple">POST</Tag></Radio>
-                            <Radio value='3'><Tag color="cyan">PUT</Tag></Radio>
+                            <Radio value={1}><Tag color="gold">GET</Tag></Radio>
+                            <Radio value={2}><Tag color="purple">POST</Tag></Radio>
+                            <Radio value={3}><Tag color="cyan">PUT</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item className='items' label='接口传参' name='apiParamType'  >
@@ -578,12 +577,12 @@ export default class AddUpdata extends Component {
                     <div style={{ display: apiRelyDispaly, width: '100%', margin: '0px 90px 0px 100px' }}>
                         <Form.Item className='item' style={{ width: '30%' }} name='apiRelyParamName'>
                             <Select
+                                placeholder="请输入依赖的接口(依赖登入，输入login)"
                                 showSearch
                                 value={this.state.apiRelySearchValue}
                                 defaultActiveFirstOption={false}
                                 showArrow={false}
                                 filterOption={false}
-                                placeholder="请输入依赖的接口"
                                 onSearch={this.apiRelySearch}
                                 onChange={this.apiRelyChange}
                                 notFoundContent={null}
@@ -594,11 +593,11 @@ export default class AddUpdata extends Component {
                         <Form.Item className='item' style={{ width: '20%' }} name='apiRelyParamValue'>
                             <Select
                                 showSearch
+                                placeholder="请选择依赖的字段（依赖登入，输入路径   ）"
                                 value={this.state.apiRelySearchName}
                                 defaultActiveFirstOption={false}
                                 showArrow={false}
                                 filterOption={false}
-                                placeholder="请选择依赖的字段"
                                 notFoundContent={null}
                             >
                                 {apiRelyNameOptions}
@@ -614,13 +613,13 @@ export default class AddUpdata extends Component {
                     </Form.Item>
                     <div style={{ width: '100%', margin: '0px 90px 0px 100px' }}>
                         <div style={{ width: '30%', display: headerFiexdParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('headerFiexdParam', '参数名', '参数值', 'header固定参数',headerFiexdParamDisplay)}
+                            {frist('headerFiexdParam', '参数名', '参数值', 'header固定参数', headerFiexdParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: headerRelyParamDisplay, margin: '0px 10px', verticalAlign: 'top' }}>
-                            {second('headerRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'header依赖参数',headerRelyParamDisplay)}
+                            {second('headerRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'header依赖参数', headerRelyParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: headerHandleParamDisplay, verticalAlign: 'top', }}>
-                            {frist('headerHandleParam', '参数名', '默认值', 'header自定义参数',headerHandleParamDisplay)}
+                            {frist('headerHandleParam', '参数名', '默认值', 'header自定义参数', headerHandleParamDisplay)}
                         </div>
                     </div>
                     <Form.Item className='item' name='webformParamType' label='webform' >
@@ -632,12 +631,12 @@ export default class AddUpdata extends Component {
                     </Form.Item>
                     <div style={{ width: '100%', margin: '0px 90px 0px 100px' }}>
                         <div style={{ width: '30%', display: webformFiexdParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('webformFiexdParam', '参数名', '参数值', 'webform固定参数',webformFiexdParamDisplay)}
+                            {frist('webformFiexdParam', '参数名', '参数值', 'webform固定参数', webformFiexdParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: webformRelyParamDisplay, margin: '0px 10px', verticalAlign: 'top' }}>
-                            {second('webformRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'webform依赖参数',webformRelyParamDisplay)}
+                            {second('webformRelyParam', '参数名', '依赖参数名', '依赖接口路径', 'webform依赖参数', webformRelyParamDisplay)}
                         </div>
-                        <div style={{ width: '30%', display: webformHandleParamDisplay, verticalAlign: 'top', margin: '0px 10px',webformHandleParamDisplay }}>
+                        <div style={{ width: '30%', display: webformHandleParamDisplay, verticalAlign: 'top', margin: '0px 10px', webformHandleParamDisplay }}>
                             {frist('webformHandleParam', '参数名', '默认值', 'webform自定义参数')}
                         </div>
                     </div>
@@ -659,10 +658,10 @@ export default class AddUpdata extends Component {
                             </Form.Item>
                         </div>
                         <div style={{ width: '30%', display: bodyRelyParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {second('bodyRelyParam', '参数路径', '依赖参数名', '依赖接口路径', 'body依赖参数',bodyRelyParamDisplay)}
+                            {second('bodyRelyParam', '参数路径', '依赖参数名', '依赖接口路径', 'body依赖参数', bodyRelyParamDisplay)}
                         </div>
                         <div style={{ width: '30%', display: bodyHandleParamDisplay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('bodyHandleParam', '参数路径', '默认值', 'body自定义参数',bodyHandleParamDisplay)}
+                            {frist('bodyHandleParam', '参数路径', '默认值', 'body自定义参数', bodyHandleParamDisplay)}
                         </div>
                     </div>
                     <Form.Item label='是否被依赖' className='item' name='isRely'>
@@ -670,7 +669,7 @@ export default class AddUpdata extends Component {
                     </Form.Item>
                     <div style={{ width: '100%', margin: '0px 90px 0px 100px' }}>
                         <div style={{ width: '50%', display: isRelyDispay, verticalAlign: 'top', margin: '0px 10px' }}>
-                            {frist('relyValue', '依赖值名称', '依赖路径', '需要存起来的依赖值',isRelyDispay)}
+                            {frist('relyValue', '依赖值名称', '依赖路径', '需要存起来的依赖值', isRelyDispay)}
                         </div>
                     </div>
                     <Form.Item className='item' name='responseBase' label='返回值样式'>

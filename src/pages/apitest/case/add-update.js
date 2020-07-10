@@ -5,7 +5,7 @@ import {
     Card, Form, Input, Select, Button,
     Tag, Radio, Checkbox, Row, Col, Switch, message
 } from 'antd'
-import { ArrowLeftOutlined, NodeExpandOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
 import { addApiCaseData, updateApiCaseData } from '../../../api/index'
@@ -24,7 +24,7 @@ export default class CaseAddUpdate extends Component {
             bodyHandleParam: [],
             isDepend: true,
             statusAssertion: '200',
-            otherAssertioin: [],
+            otherAssertionType: [],
 
 
         },
@@ -48,6 +48,7 @@ export default class CaseAddUpdate extends Component {
         relyTestMarkValue: null,
         relyTestIdValue: null,
         deviceTypeDispaly: 'none',
+        responseValueExpectDisplay: 'none',
     }
 
 
@@ -148,7 +149,24 @@ export default class CaseAddUpdate extends Component {
             this.setState({ deviceTypeDispaly: 'block' });
         }
 
+        const otherAssertionType = data.otherAssertionType;
+        if (otherAssertionType) {
+            otherAssertionType.map(item => {
+                if (item == '2') {
+                    this.setState({ responseValueExpectDisplay: 'block' });
+                }
+            });
+        }
+
     }
+    responseValueExpectDisplayOnChange = e => {
+        if (e.target.checked) {
+            this.setState({ responseValueExpectDisplay: 'block' });
+        } else {
+            this.setState({ responseValueExpectDisplay: 'none' });
+        }
+    }
+
     render() {
         const {
             isRelyDisplay,
@@ -166,7 +184,7 @@ export default class CaseAddUpdate extends Component {
             webformRelyDisplay,
             bodyRelyDisplay,
             deviceTypeDispaly,
-
+            responseValueExpectDisplay,
         } = this.state;
 
         //一级方法
@@ -221,6 +239,7 @@ export default class CaseAddUpdate extends Component {
                                                     filterOption={false}
                                                     placeholder="go"
                                                     notFoundContent={null}
+                                                    
 
                                                 >
                                                     {getOptionMark(index)}
@@ -283,48 +302,72 @@ export default class CaseAddUpdate extends Component {
             )
         }
         //三级级级方法
-        const third = (name, disabled) => {
-            const rules = [{
-                required: true,
-                whitespace: true,
-                message: "咋不填呢",
-            }];
-
-
+        const thrid = (name, fristPlaceholder, secondPlaceholder, addName, display) => {
+            const rules = () => {
+                let required = true;
+                if (display == "none") {
+                    required = false;
+                }
+                let rule = [{
+                    required: required,
+                    whitespace: true,
+                    message: "咋不填呢",
+                }]
+                return rule;
+            };
             return (
                 <Form.List name={name} >
-                    {(fields) => {
+                    {(fields, { add, remove }) => {
                         return (
                             <div>
-                                {fields.map((field) => (
+                                {fields.map((field, index) => (
                                     <Row key={field.key} style={{ margin: '3px 0px' }}>
-                                        <Col style={{ width: '30%', margin: '0px 1px 0px 0px' }}>
+                                        <Col style={{ width: '30%', padding: '0px 1px 0px 0px' }}>
                                             <Form.Item
                                                 name={[field.name, 'name']}
                                                 fieldKey={[field.fieldKey, 'name']}
-                                                rules={rules}
+                                                rules={rules()}
                                             >
-                                                <Input className='do' disabled='true' />
+                                                <Input placeholder={fristPlaceholder} className='do' />
                                             </Form.Item>
                                         </Col>
                                         <Col style={{ width: '65%' }}>
                                             <Form.Item
                                                 name={[field.name, "value"]}
                                                 fieldKey={[field.fieldKey, "value"]}
-                                                rules={rules}
+                                                rules={rules()}
                                             >
-                                                <Input className='do' disabled={disabled} />
+                                                <Input placeholder={secondPlaceholder} className='do' />
                                             </Form.Item>
+                                        </Col>
+                                        <Col flex="none" style={{ width: '5%' }} >
+                                            <MinusCircleOutlined
+                                                style={{ height: '15px', padding: '4px' }}
+                                                onClick={() => {
+                                                    remove(field.name);
+                                                }}
+                                            />
                                         </Col>
                                     </Row>
                                 ))}
+                                <Form.Item>
+                                    <Button
+                                        className='do'
+                                        type="dashed"
+                                        onClick={() => {
+                                            add();
+                                        }}
+                                        style={{ width: "95%", marginTop: '5px' }}
+                                    >
+                                        <PlusOutlined /> {addName}
+                                    </Button>
+                                </Form.Item>
                             </div>
                         );
                     }}
                 </Form.List>
             )
         }
-
 
 
         const onFinish = async (value) => {
@@ -340,11 +383,6 @@ export default class CaseAddUpdate extends Component {
             const user = memoryUtils.user;
             const data = this.props.location.state;
             const apiId = data.apiId;
-            const device = data.device;
-            if (device == "2" || device == "3" || device == "4") {
-            } else {
-                value.deviceType = device;
-            }
             let values = Object.assign(value, { "userId": user.id, 'apiId': apiId })
 
             let response;
@@ -397,37 +435,56 @@ export default class CaseAddUpdate extends Component {
 
 
         const deviceTypeList = () => {
-
             const data = this.props.location.state;
-            const device = data.device
+            const device = data.deviceTypeList;
+            console.log(device)
+            let option = [];
+            device.map((item, index) => {
+                console.log(item)
+                option.push(<Radio value={index+1}><Tag color='magenta'>{item}</Tag></Radio>)
+            })
+            return option;
 
+            // const store = (
+            //     <Radio.Group>
+            //         <Radio value='2.1'><Tag color="magenta">网红授权/取货点/网红店旗下服务车</Tag></Radio>
+            //         <Radio value='2.2'><Tag color="magenta">非授权门店</Tag></Radio>
+            //         <Radio value='2.3'><Tag color="magenta">社会服务车</Tag></Radio>
+            //         <Radio value='2.4'><Tag color="magenta">取货方门店</Tag></Radio>
+            //         <Radio value='2.5'><Tag color="magenta">取货方门店下服务车</Tag></Radio>
+            //         <Radio value='2.6'><Tag color="magenta">取货方社会服务车</Tag></Radio>
+            //         <Radio value='2.7'><Tag color="magenta">13588096710</Tag></Radio>
+            //     </Radio.Group>
+            // )
+            // const driver = (
+            //     <Radio.Group>
+            //         <Radio value='3.1'><Tag color="magenta">基础司机账号</Tag></Radio>
+            //         <Radio value='3.2'><Tag color="magenta">13588096710</Tag></Radio>
+            //     </Radio.Group>
+            // )
+            // const drivers = (
+            //     <Radio.Group>
+            //         <Radio value='12.1'><Tag color="magenta">门店车队账号</Tag></Radio>
+            //         <Radio value='12.2'><Tag color="magenta">门店车队下司机账号</Tag></Radio>
+            //         <Radio value='12.3'><Tag color="magenta">平台车队账号</Tag></Radio>
+            //         <Radio value='12.4'><Tag color="magenta">平台车队下司机账号</Tag></Radio>
+            //         <Radio value='12.5'><Tag color="magenta">集团账号</Tag></Radio>
+            //         <Radio value='12.6'><Tag color="magenta">集团车队账号</Tag></Radio>
+            //         <Radio value='12.7'><Tag color="magenta">集团车队下账号</Tag></Radio>
+            //     </Radio.Group>
+            // )
 
-            const store = (
-                <Radio.Group>
-                    <Radio value='2.1'><Tag color="magenta">网红授权/取货点/网红店旗下服务车</Tag></Radio>
-                    <Radio value='2.2'><Tag color="magenta">非授权门店</Tag></Radio>
-                    <Radio value='2.3'><Tag color="magenta">社会服务车</Tag></Radio>
-                    <Radio value='2.4'><Tag color="magenta">取货方门店</Tag></Radio>
-                    <Radio value='2.5'><Tag color="magenta">取货方门店下服务车</Tag></Radio>
-                    <Radio value='2.6'><Tag color="magenta">取货方社会服务车</Tag></Radio>
-                    <Radio value='2.7'><Tag color="magenta">13588096710</Tag></Radio>
-                </Radio.Group>
-            )
-            const driver = (
-                <Radio.Group>
-                    <Radio value='3.1'><Tag color="magenta">基础司机账号</Tag></Radio>
-                    <Radio value='3.2'><Tag color="magenta">13588096710</Tag></Radio>
-                </Radio.Group>
-            )
+            // switch (device) {
+            //     case '2':
+            //         return store;
+            //     case '3':
+            //         return driver;
+            //     case '4':
+            //         return driver;
+            //     case '12':
+            //         return drivers;
 
-            switch (device) {
-                case '2':
-                    return store;
-                case '3':
-                    return driver;
-                case '4':
-                    return driver;
-            }
+            // }
         }
 
         const defaultChecked = () => {
@@ -458,9 +515,11 @@ export default class CaseAddUpdate extends Component {
                     <Form.Item className='item' label='接口描述' name='apiMark'>
                         <Input className='do' disabled />
                     </Form.Item>
-                    <div style={{ display: deviceTypeDispaly, width: "100%" }}>
+                    <div style={{ width: "100%" }}>
                         <Form.Item className='itemss' label='角色类型' name='deviceType' >
-                            {deviceTypeList()}
+                            <Radio.Group>
+                                {deviceTypeList()}
+                            </Radio.Group>
                         </Form.Item>
                     </div>
                     <Form.Item className='item' label='用例描述' name='apiCaseMark' rules={rules}>
@@ -556,21 +615,27 @@ export default class CaseAddUpdate extends Component {
                             <Select.Option value='406'>406</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item className='item' label='其他断言' name='otherAssertioin'>
+                    <Form.Item className='item' label='其他断言' name='otherAssertionType'>
                         <Checkbox.Group >
-                            <Checkbox value='1'><Tag color="purple">全部返回值断言</Tag></Checkbox>
-                            <Checkbox value='2'><Tag color="purple">部分返回值断言</Tag></Checkbox>
+                            <Checkbox value='1'><Tag color="purple">返回值结构断言</Tag></Checkbox>
+                            <Checkbox value='2' onChange={this.responseValueExpectDisplayOnChange}><Tag color="purple">特定返回值断言</Tag></Checkbox>
                             <Checkbox value='3'><Tag color="red">数据落库断言</Tag></Checkbox>
                             <Checkbox value='4'><Tag color="green">返回值与数据库比对断言</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
+                    <div style={{ display: responseValueExpectDisplay, width: '50%' }}>
+                        <Form.Item label='返回期望' className='itemss'>
+                            {thrid('responseValueExpect', '路径', '期望值', '添加期望值', responseValueExpectDisplay)}
+                        </Form.Item>
+                    </div>
+
+
                     <Form.Item className='item' style={{ textAlign: 'center' }} >
                         <Button type="primary" htmlType="submit" style={{ backgroundColor: 'yellow', color: 'black', margin: '0px 10px' }}>
                             提交
                         </Button>
                     </Form.Item>
                     <div style={{ height: '100px' }}></div>
-
                 </Form>
 
             </Card>

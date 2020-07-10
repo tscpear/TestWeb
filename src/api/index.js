@@ -7,7 +7,8 @@ import ajax from './ajax'
 // }
 
 
-export const reqLogin = (username, password) => ajax('/login', { username, password }, 'POST')
+
+export const reqLogin = (username, password,projectId) => ajax('/login', { username, password,projectId }, 'POST')
 
 export const getApiUriList = (obj) => {
     let url = `/api/list?page=${obj.page}&limit=${obj.limit}`
@@ -64,9 +65,9 @@ export const getApiReport = (testIdList) => ajax('/report/list', testIdList, "PO
 
 export const getApiHomeList = (obj) => ajax(`/report/mainList?page=${obj.page}&limit=${obj.limit}`,{},"GET")
 
-export const searchTest = (value) => ajax(`/api/searchRely?path=${value}`, {}, 'GET')
+export const searchTest =   (value) => ajax(`/api/searchRely?path=${value}`, {}, 'GET')
 
-export const searchTestName = (value) => ajax(`/api/searchRelyName?path=${value}`, {}, 'GET')
+export const searchTestName = (value,device) => ajax(`/api/searchRelyName?path=${value}&device=${device}`, {}, 'GET')
 
 export const getApiGroupList = (obj) => {
     let url = `/apigroup/list?page=${obj.page}&limit=${obj.limit}`
@@ -79,3 +80,9 @@ export const doTest = (obj) => ajax("/report/do",obj,"POST");
 export const getOneReport = (id) => ajax(`/report/one?id=${id}`,{},'GET')
 
 export const crateDataTire = (value,environment) =>ajax(`/createData/tire?orderSn=${value}&environment=${environment}`,{},'GET')
+
+export const getReportResultTable = (obj) => ajax("/report/reportList",obj,"POST");
+
+export const getProjectList = () =>ajax("/project",{},"GET");
+
+export const getAccountList =(obj)=>ajax('/report/account', obj ,'POST')
