@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { crateDataTire } from '../../../api/index'
-import { Card, Table, Button, message, Tag, Select, Input, Spin ,} from 'antd'
-import { AudioOutlined } from '@ant-design/icons';
+import { Card, message,Select, Input, } from 'antd'
 export default class Tire extends Component {
     state = {
         environment: "uat",

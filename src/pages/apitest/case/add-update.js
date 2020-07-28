@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
-import { addApiData, updateApiData } from '../../../api/index'
-
 import {
     Card, Form, Input, Select, Button,
-    Tag, Radio, Checkbox, Row, Col, Switch, message
+    Tag, Radio, Checkbox, Row, Col, Switch
 } from 'antd'
 import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
 import { addApiCaseData, updateApiCaseData } from '../../../api/index'
+import { responseJudge } from '../../../components/public';
 
 export default class CaseAddUpdate extends Component {
     state = {
@@ -49,6 +48,7 @@ export default class CaseAddUpdate extends Component {
         relyTestIdValue: null,
         deviceTypeDispaly: 'none',
         responseValueExpectDisplay: 'none',
+        sqlValueExpectDisplay: 'none',
     }
 
 
@@ -166,6 +166,13 @@ export default class CaseAddUpdate extends Component {
             this.setState({ responseValueExpectDisplay: 'none' });
         }
     }
+    sqlValueExpectDisplayOnChange = e => {
+        if (e.target.checked) {
+            this.setState({ sqlValueExpectDisplay: 'block' });
+        } else {
+            this.setState({ sqlValueExpectDisplay: 'none' });
+        }
+    }
 
     render() {
         const {
@@ -185,6 +192,7 @@ export default class CaseAddUpdate extends Component {
             bodyRelyDisplay,
             deviceTypeDispaly,
             responseValueExpectDisplay,
+            sqlValueExpectDisplay,
         } = this.state;
 
         //一级方法
@@ -281,7 +289,7 @@ export default class CaseAddUpdate extends Component {
                                                 fieldKey={[field.fieldKey, 'name']}
                                                 {...rules}
                                             >
-                                                <Input className='do' disabled='true' />
+                                                <Input className='do' disabled={true} />
                                             </Form.Item>
                                         </Col>
                                         <Col style={{ width: '65%' }}>
@@ -390,24 +398,16 @@ export default class CaseAddUpdate extends Component {
             if (data.id) {
                 value = Object.assign(value, { "id": this.props.location.state.id })
                 response = await updateApiCaseData(values);
-                result = response.data;
-                if (result.code == 1) {
+                result = responseJudge(response);
+                if (result) {
                     this.props.history.goBack();
-
-                } else {
-                    const msg = response.data.msg
-                    message.error(msg)
-                }
+                } 
             } else {
                 response = await addApiCaseData(values);
-                result = response.data;
-                if (result.code == 1) {
+                result =responseJudge(response);
+                if (result) {
                     this.props.history.goBack();
-
-                } else {
-                    const msg = response.data.msg
-                    message.error(msg)
-                }
+                } 
             }
 
         }
@@ -437,54 +437,11 @@ export default class CaseAddUpdate extends Component {
         const deviceTypeList = () => {
             const data = this.props.location.state;
             const device = data.deviceTypeList;
-            console.log(device)
             let option = [];
             device.map((item, index) => {
-                console.log(item)
-                option.push(<Radio value={index+1}><Tag color='magenta'>{item}</Tag></Radio>)
+                option.push(<Radio value={index+1} key={index+1}><Tag color='magenta'>{item}</Tag></Radio>)
             })
             return option;
-
-            // const store = (
-            //     <Radio.Group>
-            //         <Radio value='2.1'><Tag color="magenta">网红授权/取货点/网红店旗下服务车</Tag></Radio>
-            //         <Radio value='2.2'><Tag color="magenta">非授权门店</Tag></Radio>
-            //         <Radio value='2.3'><Tag color="magenta">社会服务车</Tag></Radio>
-            //         <Radio value='2.4'><Tag color="magenta">取货方门店</Tag></Radio>
-            //         <Radio value='2.5'><Tag color="magenta">取货方门店下服务车</Tag></Radio>
-            //         <Radio value='2.6'><Tag color="magenta">取货方社会服务车</Tag></Radio>
-            //         <Radio value='2.7'><Tag color="magenta">13588096710</Tag></Radio>
-            //     </Radio.Group>
-            // )
-            // const driver = (
-            //     <Radio.Group>
-            //         <Radio value='3.1'><Tag color="magenta">基础司机账号</Tag></Radio>
-            //         <Radio value='3.2'><Tag color="magenta">13588096710</Tag></Radio>
-            //     </Radio.Group>
-            // )
-            // const drivers = (
-            //     <Radio.Group>
-            //         <Radio value='12.1'><Tag color="magenta">门店车队账号</Tag></Radio>
-            //         <Radio value='12.2'><Tag color="magenta">门店车队下司机账号</Tag></Radio>
-            //         <Radio value='12.3'><Tag color="magenta">平台车队账号</Tag></Radio>
-            //         <Radio value='12.4'><Tag color="magenta">平台车队下司机账号</Tag></Radio>
-            //         <Radio value='12.5'><Tag color="magenta">集团账号</Tag></Radio>
-            //         <Radio value='12.6'><Tag color="magenta">集团车队账号</Tag></Radio>
-            //         <Radio value='12.7'><Tag color="magenta">集团车队下账号</Tag></Radio>
-            //     </Radio.Group>
-            // )
-
-            // switch (device) {
-            //     case '2':
-            //         return store;
-            //     case '3':
-            //         return driver;
-            //     case '4':
-            //         return driver;
-            //     case '12':
-            //         return drivers;
-
-            // }
         }
 
         const defaultChecked = () => {
@@ -503,7 +460,7 @@ export default class CaseAddUpdate extends Component {
                 <Form
                     name='form'
                     layout='inline'
-                    hideRequiredMark='true'
+                    hideRequiredMark={true}
                     labelAlign='left'
                     onFinish={onFinish}
                     {...forms()}
@@ -527,9 +484,9 @@ export default class CaseAddUpdate extends Component {
                     </Form.Item>
                     <Form.Item className='item' label='用例类型' name='apiCaseType' rules={rules}>
                         <Radio.Group>
-                            <Radio value='1'><Tag color="green">任意使用</Tag></Radio>
-                            <Radio value='2'><Tag color="geekblue">仅限流程</Tag></Radio>
-                            <Radio value='3'><Tag color="red">内部消耗</Tag></Radio>
+                            <Radio value='1'><Tag color="green">正常使用</Tag></Radio>
+                            <Radio value='2'><Tag color="geekblue">重在回归</Tag></Radio>
+                            <Radio value='3'><Tag color="red">创建数据</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item className='item' label='用例等级' name='apiCaseLv' rules={rules} >
@@ -594,7 +551,7 @@ export default class CaseAddUpdate extends Component {
                                         className='do'
                                         placeholder="返回值基本格式"
                                         autoSize={{ minRows: 3, maxRows: 10 }}
-                                        disabled='true'
+                                        disabled={true}
                                     />
                                 </Form.Item>
                             </div>
@@ -609,27 +566,32 @@ export default class CaseAddUpdate extends Component {
                         </Form.Item>
                     </div>
                     <Form.Item className='item' label='响应断言' name='statusAssertion'>
-                        <Select dropdownClassName='do' autoFocus='true' style={{ width: '100px' }}>
+                        <Select dropdownClassName='do' autoFocus={true} style={{ width: '100px' }}>
                             <Select.Option value='200'>200</Select.Option>
+                            <Select.Option value='201'>201</Select.Option>
                             <Select.Option value='403'>403</Select.Option>
                             <Select.Option value='406'>406</Select.Option>
+                            <Select.Option value='500'>500</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item className='item' label='其他断言' name='otherAssertionType'>
                         <Checkbox.Group >
                             <Checkbox value='1'><Tag color="purple">返回值结构断言</Tag></Checkbox>
                             <Checkbox value='2' onChange={this.responseValueExpectDisplayOnChange}><Tag color="purple">特定返回值断言</Tag></Checkbox>
-                            <Checkbox value='3'><Tag color="red">数据落库断言</Tag></Checkbox>
+                            <Checkbox value='3' onChange={this.sqlValueExpectDisplayOnChange}><Tag color="red">数据落库字段值断言</Tag></Checkbox>
                             <Checkbox value='4'><Tag color="green">返回值与数据库比对断言</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
                     <div style={{ display: responseValueExpectDisplay, width: '50%' }}>
-                        <Form.Item label='返回期望' className='itemss'>
+                        <Form.Item label='返值期望' className='itemss'>
                             {thrid('responseValueExpect', '路径', '期望值', '添加期望值', responseValueExpectDisplay)}
                         </Form.Item>
                     </div>
-
-
+                    <div style={{ display: sqlValueExpectDisplay, width: '100%' }}>
+                        <Form.Item label='库值期望' className='itemss'>
+                            {thrid('sqlValueExpect', '期望值', 'sql语言', '添加期望值', sqlValueExpectDisplay)}
+                        </Form.Item>
+                    </div>
                     <Form.Item className='item' style={{ textAlign: 'center' }} >
                         <Button type="primary" htmlType="submit" style={{ backgroundColor: 'yellow', color: 'black', margin: '0px 10px' }}>
                             提交

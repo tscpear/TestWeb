@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { Card, Table, Button, message, Tag, Select, Input } from 'antd'
-import { PlusOutlined, FileSearchOutlined, DeleteOutlined } from '@ant-design/icons'
-import { getApiHomeList, getApiData, delApiData, getApiForCaseData } from '../../../api/index'
+import { Card, Table, Button} from 'antd'
+import { PlusOutlined, FileSearchOutlined} from '@ant-design/icons'
+import { getApiHomeList} from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
-import memoryUtils from '../../../utils/memoryUtils'
+import { responseJudge } from '../../../components/public'
 
 export default class ReportHome extends Component {
 
@@ -71,7 +71,7 @@ export default class ReportHome extends Component {
         
     }
     //为第一次render准备数据
-    componentWillMount() {
+    UNSAFE_componentWillMount () {
         this.initColumns()
     }
     componentDidMount(){
@@ -83,8 +83,8 @@ export default class ReportHome extends Component {
         this.setState({ loading: true })
         const response = await getApiHomeList(obj)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const dataList = result.data
             const count = result.count
             //更新状态
@@ -92,12 +92,7 @@ export default class ReportHome extends Component {
                 dataList,
                 total: count
             })
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
-    
-
     }
 
     render() {

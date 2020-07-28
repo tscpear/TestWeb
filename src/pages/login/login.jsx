@@ -21,11 +21,11 @@ export default class Login extends Component {
     getProjectList = async () => {
         const response = await getProjectList()
         const result = response.data;
-        if (result.code == 1) {
+        if (result.code === 1) {
             this.setState({items:result.data})
         }
     }
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.getProjectList()
     }
     selectProject=(value)=>{
@@ -54,13 +54,15 @@ export default class Login extends Component {
                 const environment = result.environment;
                 const projectName = result.projectName;
                 const deviceList = result.device;
+                const token = result.token;
                 memoryUtils.projectId = projectId
                 storageUtils.saveData('project_id_key',projectId)
                 memoryUtils.user = user
                 storageUtils.saveData('user_key',user);
                 storageUtils.saveData('environment_key',environment);
                 storageUtils.saveData('project_name_key',projectName);
-                storageUtils.saveData('device_list_key',deviceList)
+                storageUtils.saveData('device_list_key',deviceList);
+                storageUtils.saveData('token_key',token)
                 this.props.history.replace('/')
             } else {
                 message.error(result.msg)
@@ -111,8 +113,8 @@ export default class Login extends Component {
                                     </div>
                                 )}
                             >
-                                {items.map(item => (
-                                    <Select.Option key={item.id}>{item.name}</Select.Option>
+                                {items.map((item,index) => (
+                                    <Select.Option key={index} value={item.id}>{item.name}</Select.Option>
                                 ))}
                             </Select>
                         </div>

@@ -18,7 +18,6 @@ class LeftNav extends Component {
         return menuList.map(item => {
 
             if (!item.children) {
-                console.log("测试:" + item.title);
                 return (
                     <Menu.Item key={item.key}>
                         <Link to={item.key}>
@@ -33,7 +32,6 @@ class LeftNav extends Component {
                 if (!cItem) {
                 } else { this.openKey = item.key }
                 return (
-                    console.log(item.key),
                     <SubMenu
                         key={item.key}
                         title={
@@ -53,7 +51,7 @@ class LeftNav extends Component {
     //再第一次runder之前 执行一次
     //为第一个 准备数据  
  
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.menuNodes = this.getMenuNodes(menuList)
     }
 

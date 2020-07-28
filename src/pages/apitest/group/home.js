@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { Card, Table, Button, message, Tag, Select, Input } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined ,RedoOutlined} from '@ant-design/icons'
+import { Card, Table, Button} from 'antd'
+import { PlusOutlined,RedoOutlined} from '@ant-design/icons'
 import { getApiGroupList } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
-import memoryUtils from '../../../utils/memoryUtils'
+import { responseJudge } from '../../../components/public'
 
 export default class GroupHome extends Component{
     state = {
@@ -85,13 +85,10 @@ export default class GroupHome extends Component{
         this.setState({ loading: true })
         const response = await getApiGroupList(obj)
         this.setState({ loading: false })
-        const result = response.data;
-        const data = result.data;
-        if(result.code == '1'){
+        const result = responseJudge(response);
+        if(result){
+            const data = result.data;
             this.setState({list:data})
-            message.success(result.msg);
-        }else{
-            message.error(result.msg)
         }
     }
     //为第一次render准备数据

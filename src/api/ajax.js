@@ -11,10 +11,7 @@ export default function ajax(url, data = {}, type) {
     return new Promise((resolve, reject) => {
         let promise;
         const projectId = storageUtils.getProjectId();
-        
-    
-        
-        
+        const token = storageUtils.getData("token_key");
         //执行异步ajax请求
     
         // if (type === 'GET') {
@@ -32,7 +29,7 @@ export default function ajax(url, data = {}, type) {
             method: type,
             url: url,
             data: data,
-            headers:{'projectId':projectId}
+            headers:{'projectId':projectId,'token':token}
          
         })
           //如果成功了，调用resolve（value）

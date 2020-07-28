@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { Card, Table, Button, message, Tag, Select, Input } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { Card, Table, Button, Tag, Select, Input } from 'antd'
+import {  EditOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { getApiCaseData, getApiCaseList, delApiCaseData } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
-import { deviceNameOfList, deviceColorOfList, deviceSelect } from '../../../components/public'
+import { deviceNameOfList, deviceColorOfList, deviceSelect, responseJudge } from '../../../components/public'
 
 const Option = Select.Option
 
@@ -21,7 +21,8 @@ export default class ApiCaseHome extends Component {
             apiPath: '',
             apiCaseMark: '',
             device: '0',
-            limit: PAGE_SIZE
+            limit: PAGE_SIZE,
+            apiCaseType: 0,
         },
         apiCaseData: {},
         rules: [{
@@ -35,8 +36,8 @@ export default class ApiCaseHome extends Component {
         this.setState({ loading: true })
         const response = await getApiCaseList(obj)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const apiCaseList = result.data
             const count = result.count
             apiCaseList.map((item, index) => {
@@ -47,9 +48,6 @@ export default class ApiCaseHome extends Component {
                 apiCaseList,
                 total: count
             })
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
     }
 
@@ -99,15 +97,15 @@ export default class ApiCaseHome extends Component {
                     let color
                     let value
                     switch (apiCaseLv) {
-                        case '1':
+                        case 1:
                             color = 'green';
                             value = '无关紧要';
                             break;
-                        case '2':
+                        case 2:
                             color = 'blue';
                             value = '一般般啦';
                             break;
-                        case '3':
+                        case 3:
                             color = 'red';
                             value = '叼的一匹';
                             break;
@@ -132,17 +130,17 @@ export default class ApiCaseHome extends Component {
                     let color
                     let value
                     switch (apiCaseType) {
-                        case '1':
+                        case 1:
                             color = 'green';
-                            value = '任意使用';
+                            value = '正常使用';
                             break;
-                        case '2':
+                        case 2:
                             color = 'blue';
-                            value = '仅限流程';
+                            value = '重在回归';
                             break;
-                        case '3':
+                        case 3:
                             color = 'red';
-                            value = '内部消耗';
+                            value = '创建数据';
                             break;
                         default:
                             break;
@@ -180,12 +178,9 @@ export default class ApiCaseHome extends Component {
         this.setState({ loading: true })
         const response = await delApiCaseData(id, userId)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             this.getApiCaseList(obj)
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
     }
 
@@ -194,18 +189,15 @@ export default class ApiCaseHome extends Component {
         this.setState({ loading: true });
         const response = await getApiCaseData(id, userId)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const apiCaseData = result.data;
             this.props.history.push('/apitest/case/update', apiCaseData);
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
     }
 
     //为第一次render准备数据
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.initColumns()
     }
     //执行异步任务
@@ -229,9 +221,10 @@ export default class ApiCaseHome extends Component {
             obj.apiPath = value.target.value
         } else if (type === 3) {
             obj.apiCaseMark = value.target.value
+        }else if (type === 4){
+            obj.apiCaseType = value;
         }
         this.setState({ obj: obj })
-        console.log(this.state.obj)
         this.getApiCaseList(obj)
 
 
@@ -239,7 +232,10 @@ export default class ApiCaseHome extends Component {
 
     deviceChange = (value) => {
         this.rearchChange(value, 1)
-        
+
+    }
+    apiCaseLvChange = (value) => {
+        this.rearchChange(value, 4);
     }
     apiPathChange = (value) => {
         this.rearchChange(value, 2)
@@ -257,22 +253,21 @@ export default class ApiCaseHome extends Component {
     }
     onSelectChange = selectedRowKeys => {
         const { apiCaseList } = this.state;
-        console.log('selectedRowKeys changed: ', selectedRowKeys); 
         let selectedTestId = [];
         selectedRowKeys.map(item => {
             selectedTestId.push(apiCaseList[item].id)
         })
-        this.setState({ selectedRowKeys,selectedTestId });
+        this.setState({ selectedRowKeys, selectedTestId });
     };
 
 
     render() {
 
-        const { apiCaseList, loading, total, obj, rules, selectedTestId, selectedRowKeys
+        const { apiCaseList, loading, total, obj, selectedTestId, selectedRowKeys
         } = this.state;
         const title = (
             <span>
-                <Select style={{ width: 150 }} value={obj.device} onChange={this.deviceChange}>
+                <Select style={{ width: 150, margin: "0 15px 0 0" }} value={obj.device} onChange={this.deviceChange}>
                     <Option value='0'>请选择设备</Option>
                     {deviceSelect()}
                 </Select>
@@ -280,6 +275,12 @@ export default class ApiCaseHome extends Component {
                 </Input>
                 <Input style={{ width: 200, margin: "0 15px" }} placeholder='描述' value={obj.apiCaseMark} onChange={event => this.apiCaseMarkChange(event)} className='do'>
                 </Input>
+                <Select style={{ width: 150, margin: "0 15px " }} value={obj.apiCaseType} onChange={this.apiCaseLvChange}>
+                    <Option value={0}>请选择用例类型</Option>
+                    <Option value={1}>正常使用</Option>
+                    <Option value={2}>重在回归</Option>
+                    <Option value={3}>创建数据</Option>
+                </Select>
                 <Button type="primary" onClick={() => this.clear()}>
                     清空
         </Button>
@@ -293,14 +294,14 @@ export default class ApiCaseHome extends Component {
 
         const extra = (
             <Button type="primary" onClick={() => this.props.history.push('/apitest/case/dotest', selectedTestId)} disabled={
-                selectedRowKeys.length == 0 ? true : false
+                selectedRowKeys.length === 0 ? true : false
             }>
                 <PlayCircleOutlined />
                 执行用例
             </Button>
         )
-        const showTotal =(total, range) =>{
-            return "共 "+total+" 条"
+        const showTotal = (total, range) => {
+            return "共 " + total + " 条"
         }
 
         return (
@@ -315,15 +316,15 @@ export default class ApiCaseHome extends Component {
                     pagination={{
                         defaultPageSize: PAGE_SIZE,
                         total: total,
-                        pageSizeOptions:['10', '20', '50', '100','200','500','1000','5000'],
-                        showSizeChanger:true,
-                        showTotal:showTotal,
-                        onChange: (pageNum,pageSize) => {
+                        pageSizeOptions: ['10', '20', '50', '100', '200', '500', '1000', '5000'],
+                        showSizeChanger: true,
+                        showTotal: showTotal,
+                        onChange: (pageNum, pageSize) => {
                             obj.page = pageNum
                             obj.limit = pageSize
                             this.getApiCaseList(obj)
                         },
-                        onShowSizeChange: (current,size) =>{
+                        onShowSizeChange: (current, size) => {
                             obj.page = 1
                             obj.limit = size
                             this.getApiCaseList(obj)

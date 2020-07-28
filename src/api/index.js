@@ -46,9 +46,13 @@ export const getApiCaseList = (obj) => {
     if (obj.device && obj.device !== '0') {
         url = url + `&device=${obj.device}`
     }
-    if(obj.apiId && obj.apiId != 0){
+    if(obj.apiId && obj.apiId !== 0){
         url = url + `&apiId=${obj.apiId}`
     }
+    if(obj.apiCaseType && obj.apiCaseType !==0){
+        url = url + `&apiCaseType=${obj.apiCaseType}`
+    }   
+
 
     return ajax(url, {}, 'GET');
 }

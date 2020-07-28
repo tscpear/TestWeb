@@ -1,5 +1,5 @@
 import React from 'react';
-import {HomeOutlined, HeartTwoTone,SecurityScanOutlined,StarTwoTone,FireTwoTone,CrownTwoTone } from '@ant-design/icons';
+import {HomeOutlined,SecurityScanOutlined,StarTwoTone,FireTwoTone,CrownTwoTone } from '@ant-design/icons';
 
 
 const menuList = [
@@ -24,7 +24,7 @@ const menuList = [
                 icon: <StarTwoTone twoToneColor="white" />
             },
             {
-                title:'用例合集',
+                title:'接口流程',
                 key:'/apitest/group',
                 icon: <StarTwoTone twoToneColor="white" />
             },

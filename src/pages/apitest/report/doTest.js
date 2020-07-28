@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import './../index.less'
 import {
-    Card, Form, Input, Select, Button, Popconfirm, Modal, Table,
-    Tag, Radio, Checkbox, Row, Col, Switch, message, Drawer, List, Avatar, Divider, Collapse
+    Card, Input, Select, Button, Modal, Table,
+    Tag, Row, Col, Drawer, Divider, Collapse
 } from 'antd'
-import { LockOutlined, SendOutlined, SyncOutlined, FileSearchOutlined, ItalicOutlined, PlusOutlined, CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+import { LockOutlined, SendOutlined, SyncOutlined, FileSearchOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 import { PAGE_SIZE } from '../../../utils/constants'
 import { getApiReport, putToken, doTest, getOneReport, getReportResultTable, getAccountList } from '../../../api/index'
 import storageUtils from '../../../utils/storageUtils'
-import { deviceNameOfList, deviceColorOfList, deviceSelect } from '../../../components/public'
+import { deviceNameOfList, deviceColorOfList, responseJudge } from '../../../components/public'
 
 const DescriptionItem = ({ title, content }) => (
     <div className="site-description-item-profile-wrapper">
@@ -49,7 +49,8 @@ export default class DoTest extends Component {
         dotestName: '执行用例',
         account: [],
         accountValue: [],
-
+        wxCode: [],
+        wxCodeNum: 0,
     };
 
 
@@ -94,17 +95,25 @@ export default class DoTest extends Component {
                 key: 'deviceType',
                 width: 200,
                 align: "center",
-                render: (deviceType,data) => {
+                render: (deviceType, data) => {
                     const account = this.state.account;
                     if (account.length > 0) {
                         return (account.map((item) => {
-                           if(item.device == data.device && item.deviceType == data.deviceType){
-                                return item.deviceTypeName
-                           }
-                        }))
-                    }
+                            if (item.device === data.device && item.deviceType === deviceType) {
 
+                                return item.deviceTypeName;
+                            }
+
+                        }))
+                    } else {
+                        return "当前项目没有设置设备";
+                    }
                 }
+            },
+            {
+                title: '用例描述',
+                dataIndex: 'apiCaseMark',
+                key: 'apiCaseMark',
             },
             {
                 title: '路径',
@@ -115,6 +124,7 @@ export default class DoTest extends Component {
                 title: '状态码',
                 dataIndex: 'actStatus',
                 key: 'actStatus',
+                align: "center",
             },
             {
                 title: '执行结果',
@@ -122,21 +132,21 @@ export default class DoTest extends Component {
                 key: 'resultMain',
                 align: "center",
                 render: (resultMain, apiReport) => {
-                    if (resultMain != null) {
-                        if (resultMain == 0) {
+                    if (resultMain !== null) {
+                        if (resultMain === 0) {
                             return (
                                 <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><CheckCircleTwoTone twoToneColor="#52c41a" /></a>)
-                        } else if (resultMain == 1) {
+                        } else if (resultMain === 1) {
                             return (
                                 <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}> <Tag color="red">
                                     状态码与期望不一致
                                 </Tag></a>);
-                        } else if (resultMain == 2) {
+                        } else if (resultMain === 2) {
                             return (
                                 <a style={{ padding: "0 5px", color: "red" }} onClick={() => this.showDrawer(apiReport)}><Tag color="red">
                                     返回结构与期望不一致
                                </Tag></a>);
-                        } else if (resultMain == 3) {
+                        } else if (resultMain === 3) {
                             return (
                                 <a style={{ padding: "0 5px", color: "red" }} onClick={() => this.showDrawer(apiReport)}><Tag color="red">
                                     返回值与期望不一致
@@ -149,23 +159,23 @@ export default class DoTest extends Component {
 
             },
 
-            {
-                title: '操作',
-                align: 'center',
-                key: 'action',
-                width: 100,
-                render: (apiReport) => {
-                    return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
-                    </div>)
+            // {
+            //     title: '操作',
+            //     align: 'center',
+            //     key: 'action',
+            //     width: 100,
+            //     render: (apiReport) => {
+            //         return (<div >
+            //             <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
+            //         </div>)
 
-                }
-            }
+            //     }
+            // }
         ]
 
     }
     //为第一次render准备数据
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.initColumns()
     }
 
@@ -193,19 +203,20 @@ export default class DoTest extends Component {
 
     getAccount = async (tokenData) => {
         const { environment, reportId } = this.state;
-        if (reportId != 0) {
+        if (reportId !== 0) {
             tokenData.reportId = reportId;
         }
         let value = Object.assign(tokenData, { "environment": environment });
-        var response = await getAccountList(value)
-        var result = response.data;
-        var account = result.data;
-
-        var accountValue = [];
-        account.map((item, index) => {
-            accountValue[index] = item.device + '.' + item.deviceType + '.' + 1
-        });
-        this.setState({ account, accountValue })
+        var response = await getAccountList(value);
+        var result = responseJudge(response);
+        if (result) {
+            var account = result.data;
+            var accountValue = [];
+            account.map((item, index) => {
+                accountValue[index] = item.device + '.' + item.deviceType + '.' + 1;
+            });
+            this.setState({ account, accountValue })
+        }
 
     }
 
@@ -220,8 +231,8 @@ export default class DoTest extends Component {
         }
 
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const apiReport = result.data.list;
             const count = result.count
             apiReport.map((item, index) => {
@@ -232,9 +243,6 @@ export default class DoTest extends Component {
                 apiReport,
                 total: count,
             })
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
     }
 
@@ -243,43 +251,32 @@ export default class DoTest extends Component {
         this.setState({ environment: value })
     }
     putToken = async () => {
-        const { environment, accountValue } = this.state;
+        const { environment, accountValue, wxCodeNum, wxCode } = this.state;
+        let wxCodeSize = wxCode.size;
+        if (wxCodeNum === wxCodeSize) {
 
-        let value = { "environment": environment, "accountValue": accountValue };
+        }
+        let value = { "environment": environment, "accountValue": accountValue, "wxCode": wxCode };
         this.setState({ loading: true })
         const response = await putToken(value)
         this.setState({ loading: false })
-        const result = response.data
-        const msg = result.msg
-        if (result.code === 1) {
-
-            message.success(msg);
-
-        } else {
-            message.error(msg)
-        }
+        const result = responseJudge(response);
     }
     doTest = async () => {
         const { environment, tokenData, reportId, accountValue } = this.state;
-        if (reportId != 0) {
+        if (reportId !== 0) {
             tokenData.reportId = reportId;
         }
         let value = Object.assign(tokenData, { "environment": environment, "accountValue": accountValue });
         this.setState({ loading: true })
         const response = await doTest(value)
         this.setState({ loading: false })
-        const result = response.data
-        const msg = result.msg
-
-
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const data = result.data;
             const list = data.list;
             const reportId = data.reportId;
             this.setState({ apiReport: list, reportId: reportId, dotestName: '重新执行' })
-            message.success(msg);
-        } else {
-            message.error(msg)
         }
     }
 
@@ -300,14 +297,11 @@ export default class DoTest extends Component {
         this.setState({ loading: true })
         const response = await getOneReport(id)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code == 1) {
+        const result = responseJudge(response);
+        if (result) {
             const data = result.data;
             this.setState({ requestData: data });
-        } else {
-            message.error(result.msg);
         }
-
     };
     /**
      * 修改测试账户的方法
@@ -323,7 +317,7 @@ export default class DoTest extends Component {
      * json展示方法
      */
     jsonFormat = (json) => {
-        if (typeof json != 'string') {
+        if (typeof json !== 'string') {
             json = JSON.stringify(json, undefined, 2);
         }
         json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
@@ -344,6 +338,31 @@ export default class DoTest extends Component {
         });
     }
 
+    openIdOnchange = ({ target: { value } }) => {
+
+        let codeList = value.split(",");
+        this.setState({ wxCode: codeList })
+    }
+    openId = (account) => {
+        let num = 0;
+        account.map(item => {
+            let deviceName = item.deviceName;
+            if (deviceName.indexOf("小程序") !== -1) {
+                num++;
+            }
+        })
+        if (num > 0) {
+            let placeholder = "需要" + 2 * num + "个微信code(一个小程序账号需要两个code,用“,”分割)"
+            return (
+                <Input.TextArea
+                    // value={value}
+                    onChange={this.openIdOnchange}
+                    placeholder={placeholder}
+                    autoSize={{ minRows: 3, maxRows: 5 }}
+                />)
+        }
+    }
+
     render() {
 
         const { data, apiReport, total, loading, obj, requestData, responseValueExpectResult, dotestName, account } = this.state;
@@ -353,15 +372,14 @@ export default class DoTest extends Component {
 
 
         const phoneList = (item, index) => {
-
             return (
-                <div style={{ margin: '10px 0px' }}>
+                <div style={{ margin: '10px 0px' }} key={index}>
                     <div style={{ display: 'inline-block', width: '20%' }}>{item.deviceName}</div>
                     <div style={{ display: 'inline-block', width: '30%' }}>{item.deviceTypeName}</div>
                     <div style={{ display: 'inline-block', width: '50%' }}>
-                        <Select autoFocus='true' style={{ width: '200px' }} defaultValue={1} onChange={(value) => this.onChangeAccount(value, item.device, item.deviceType, index)}>
+                        <Select autoFocus={true} style={{ width: '200px' }} defaultValue={1} onChange={(value) => this.onChangeAccount(value, item.device, item.deviceType, index)}>
                             {item.accountList.map((item, index) => (
-                                <Select.Option value={index + 1}>{item}</Select.Option>
+                                <Select.Option value={index + 1} key={index + 1}>{item}</Select.Option>
                             ))}
                         </Select>
                     </div>
@@ -377,7 +395,7 @@ export default class DoTest extends Component {
                     <SyncOutlined spin />账号与环境
                  </Button>
 
-                <Input style={{ width: '100px', margin: '0px 0px 0px 20px' }} value={environmentItem[this.state.environment - 1]} />
+
                 <Button type='primary' style={{ marginLeft: '20px' }} onClick={this.doTest}>
                     <SendOutlined />{dotestName}
                 </Button>
@@ -394,9 +412,9 @@ export default class DoTest extends Component {
                     onCancel={this.hideModal}
                 >
                     <div>
-                        <Select autoFocus='true' style={{ width: '100px' }} defaultValue={1} onChange={this.environmentOnChange}>
+                        <Select autoFocus={true} style={{ width: '100px' }} defaultValue={1} onChange={this.environmentOnChange}>
                             {environmentItem.map((item, index) => (
-                                <Select.Option value={index + 1}>{item}</Select.Option>
+                                <Select.Option value={index + 1} key={index + 1}>{item}</Select.Option>
                             ))}
                         </Select>
                     </div>
@@ -405,7 +423,10 @@ export default class DoTest extends Component {
                             return phoneList(item, index);
                         })}
                     </div>
-                    <Button type='primary' style={{ backgroundColor: 'orange', border: '1px solid orange' }} onClick={this.putToken}>
+                    <div style={{ marginRight: "35px" }}>
+                        {this.openId(account)}
+                    </div>
+                    <Button type='primary' style={{ backgroundColor: 'orange', border: '1px solid orange', margin: "20px 0px 0px 0px" }} onClick={this.putToken}>
                         <LockOutlined />固定token
                 </Button>
                 </Modal>
@@ -455,6 +476,9 @@ export default class DoTest extends Component {
                     loading={loading}
                     bordered
                     size="small"
+                    pagination={{
+                        defaultPageSize: PAGE_SIZE,
+                    }}
 
                 />
                 <Drawer

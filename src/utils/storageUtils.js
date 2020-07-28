@@ -1,4 +1,4 @@
-import { getApiData } from "../api"
+
 
 
 /**
@@ -38,7 +38,7 @@ export default {
      * 读取
      */
     getProjectId() {
-        const a = JSON.parse(localStorage.getItem(PROID_KEY));
+        
         
         return localStorage.getItem(PROID_KEY);
     },
@@ -51,7 +51,7 @@ export default {
      * 读取
      */
     getProjectName() {
-        const a = localStorage.getItem(PRONAME_KEY);
+       
         
         return localStorage.getItem(PRONAME_KEY);
     },
@@ -85,7 +85,7 @@ export default {
      * 存储数据
      */
     saveData(key,value){    
-        if(typeof(value) == "object"){
+        if(typeof(value) === "object"){
             localStorage.setItem(key,JSON.stringify(value))
         }else{
             localStorage.setItem(key,value)
@@ -97,7 +97,7 @@ export default {
     getData(key){  
     let value = localStorage.getItem(key);
     if(value){
-        if(value.indexOf("[")!=-1 || value.indexOf('{')!=-1){
+        if(value.indexOf("[")!==-1 || value.indexOf('{')!==-1){
             console.log(value)
             return JSON.parse(value);
     

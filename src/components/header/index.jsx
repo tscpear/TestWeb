@@ -12,7 +12,6 @@ class Header extends Component {
     getTitle = () => {
         //等到当前请求路径
         let path = this.props.location.pathname
-        console.log(path)
         let title
         menuList.forEach(item => {
             if (item.key === path) {//如果当前item的对象与path匹配

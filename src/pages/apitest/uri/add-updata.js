@@ -8,7 +8,7 @@ import {
 import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
-import { deviceSelect } from '../../../components/public'
+import { deviceSelect, responseJudge } from '../../../components/public'
 
 
 export default class AddUpdata extends Component {
@@ -87,11 +87,12 @@ export default class AddUpdata extends Component {
         let headerFiexdParamDisplay = 'none';
         let headerRelyParamDisplay = 'none';
         let headerHandleParamDisplay = 'none';
+        let device = this.state.device;
         e.map(item => {
             if (item === '1') {
                 headerFiexdParamDisplay = 'inline-block';
             }
-            if (item === '2') {
+            if (item === '2' && device !== 0) {
                 headerRelyParamDisplay = 'inline-block';
             }
             if (item === '3') {
@@ -107,14 +108,15 @@ export default class AddUpdata extends Component {
         let webformFiexdParamDisplay = 'none';
         let webformRelyParamDisplay = 'none';
         let webformHandleParamDisplay = 'none';
+        let device = this.state.device;
         e.map(item => {
             if (item === '1') {
                 webformFiexdParamDisplay = 'inline-block';
             }
-            if (item === '2') {
+            if (item === '2' && device !== 0) {
                 webformRelyParamDisplay = 'inline-block';
             }
-            if (item === '3') {
+            if (item === '3' && device !== 0) {
                 webformHandleParamDisplay = 'inline-block';
             }
             return item;
@@ -126,6 +128,7 @@ export default class AddUpdata extends Component {
         let bodyFiexdParamDisplay = 'none';
         let bodyRelyParamDisplay = 'none';
         let bodyHandleParamDisplay = 'none';
+        let device = this.state.device;
         e.map(item => {
             if (item === '1') {
                 bodyFiexdParamDisplay = 'inline-block';
@@ -156,7 +159,7 @@ export default class AddUpdata extends Component {
 
     componentDidMount = () => {
         const apiData = this.props.location.state;
-        this.setState({device:apiData.device});
+        // this.setState({device:apiData.device});
         if (apiData && apiData.id) {
             this.setState({ title: "编   辑" });
             this.headerParamTypeOnChange(apiData.headerParamType);
@@ -175,6 +178,7 @@ export default class AddUpdata extends Component {
             if (apiData.isRely) {
                 this.setState({ isRelyDispay: 'block' })
             }
+            this.setState({device: apiData.device});
         }
 
 
@@ -205,7 +209,7 @@ export default class AddUpdata extends Component {
 
     searchTest = async (value, addName) => {
         const response = await searchTest(value);
-        const result = response.data;
+        const result = responseJudge(response)
         const data = result.data;
         if (addName === 'header依赖参数') {
             this.setState({ headerRelySearch: data })
@@ -220,31 +224,26 @@ export default class AddUpdata extends Component {
     }
     searchTestName = async (value, addName, index) => {
         const device = this.state.device;
-        if (device == 0) {
-
+        const response = await searchTestName(value, device);
+        const result = responseJudge(response)
+        const data = result.data;
+        if (addName === 'header依赖参数') {
+            let headerRelySearchName = this.state.headerRelySearchName;
+            let headerRelySearchNameObject = Object.assign({ "index": index, "value": data });
+            headerRelySearchName.push(headerRelySearchNameObject);
+            this.setState({ headerRelySearchName })
+        } else if (addName === 'webform依赖参数') {
+            let webformRelySearchName = this.state.webformRelySearchName;
+            let webformRelySearchNameObject = Object.assign({ "index": index, "value": data });
+            webformRelySearchName.push(webformRelySearchNameObject);
+            this.setState({ webformRelySearchName })
+        } else if (addName === 'body依赖参数') {
+            let bodyRelySearchName = this.state.bodyRelySearchName;
+            let bodyRelySearchNameObject = Object.assign({ "index": index, "value": data });
+            bodyRelySearchName.push(bodyRelySearchNameObject);
+            this.setState({ bodyRelySearchName })
         } else {
-            const response = await searchTestName(value,device);
-            const result = response.data;
-            const data = result.data;
-            if (addName === 'header依赖参数') {
-                let headerRelySearchName = this.state.headerRelySearchName;
-                let headerRelySearchNameObject = Object.assign({ "index": index, "value": data });
-                headerRelySearchName.push(headerRelySearchNameObject);
-                this.setState({ headerRelySearchName })
-            } else if (addName === 'webform依赖参数') {
-                let webformRelySearchName = this.state.headerRelySearchName;
-                let webformRelySearchNameObject = Object.assign({ "index": index, "value": data });
-                webformRelySearchName.push(webformRelySearchNameObject);
-                this.setState({ webformRelySearchName })
-            } else if (addName === 'body依赖参数') {
-                let bodyRelySearchName = this.state.headerRelySearchName;
-                let bodyRelySearchNameObject = Object.assign({ "index": index, "value": data });
-                bodyRelySearchName.push(bodyRelySearchNameObject);
-                this.setState({ bodyRelySearchName })
-            } else {
-                this.setState({ apiRelySearchName: data })
-            }
-
+            this.setState({ apiRelySearchName: data })
         }
 
     }
@@ -311,14 +310,10 @@ export default class AddUpdata extends Component {
             } else {
                 response = await addApiData(value);
             }
-            if (response.data.code || response.data.code == 1) {
+            const result = responseJudge(response);
+            if (result) {
                 this.props.history.goBack();
-            } else {
-                const msg = response.data.msg
-                message.error(msg)
             }
-
-
         }
 
 
@@ -419,21 +414,29 @@ export default class AddUpdata extends Component {
             }
 
             const nameOptions = (addName, index) => {
+                let option;
                 if (addName === 'header依赖参数') {
-                    let option;
+
                     this.state.headerRelySearchName.map(item => {
                         if (item.index == index) {
                             option = item.value.map(item => <Select.Option key={item}>{item}</Select.Option>);
                         }
                     });
-                    return option;
                 } else if (addName === 'webform依赖参数') {
-                    const option = this.state.webformRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
-                    return option;
+                    console.log(this.state.webformRelySearchName);
+                    this.state.webformRelySearchName.map(item => {
+                        if (item.index == index) {
+                            option = item.value.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                        }
+                    });
                 } else if (addName === 'body依赖参数') {
-                    const option = this.state.bodyRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
-                    return option;
+                    this.state.bodyRelySearchName.map(item => {
+                        if (item.index == index) {
+                            option = item.value.map(item => <Select.Option key={item}>{item}</Select.Option>);
+                        }
+                    });
                 }
+                return option;
             }
 
 
@@ -532,12 +535,12 @@ export default class AddUpdata extends Component {
         const apiRelyNameOptions = this.state.apiRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
 
         return (
-            <Card title={title} className='myform contentMaxHeight apidatap'>
+            <Card title={title} className='myform contentMaxHeight apidatap' >
                 <Form
                     name='form'
                     layout='inline'
                     onFinish={onFinish}
-                    hideRequiredMark='true'
+                    hideRequiredMark={true}
                     labelCol={{ span: 3 }}
                     labelAlign='left'
                     {...forms()}

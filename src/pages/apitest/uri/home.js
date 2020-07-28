@@ -1,16 +1,11 @@
 import React, { Component } from 'react'
-import { Card, Table, Button, message, Tag, Select, Input } from 'antd'
+import { Card, Table, Button, Tag, Select, Input } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { getApiUriList, getApiData, delApiData, getApiForCaseData } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
-import { deviceNameOfList, deviceColorOfList, deviceSelect } from '../../../components/public'
-
-
-const Option = Select.Option
-
-
+import { deviceNameOfList, deviceColorOfList, deviceSelect,responseJudge} from '../../../components/public'
 export default class UriHome extends Component {
 
 
@@ -134,16 +129,12 @@ export default class UriHome extends Component {
     addCase = async (id) => {
         const userId = memoryUtils.user.id;
         this.setState({ loading: true })
-        console.log(userId)
         const response = await getApiForCaseData(id, userId)
         this.setState({ loading: false })
-        const result = response.data;
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if(result){
             const apiForCaseData = result.data;
             this.props.history.push('/apitest/uri/addcase', apiForCaseData);
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
     }
 
@@ -152,38 +143,31 @@ export default class UriHome extends Component {
         const ids = { 'id': id, 'userId': user.id }
         this.setState({ loading: true })
         const response = await delApiData(ids)
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const { obj } = this.state
             this.getUriList(obj)
-        } else {
-            const msg = result.msg
-            message.error(msg)
         }
     }
 
     goToApi = async (id) => {
 
         this.setState({ loading: true })
-        console.log("你妈妈吗")
         const response = await getApiData(id)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const apiData = result.data;
             this.props.history.push('/apitest/uri/updata', apiData);
-        } else {
-            const msg = result.msg
-            message.error(msg)
-        }
+        } 
     }
 
     getUriList = async (obj) => {
         this.setState({ loading: true })
         const response = await getApiUriList(obj)
         this.setState({ loading: false })
-        const result = response.data
-        if (result.code === 1) {
+        const result = responseJudge(response);
+        if (result) {
             const apiList = result.data
             const count = result.count
             apiList.map((item, index) => {
@@ -194,14 +178,11 @@ export default class UriHome extends Component {
                 apiList,
                 total: count
             })
-        } else {
-            const msg = result.msg
-            message.error(msg)
-        }
+        } 
     }
 
     //为第一次render准备数据
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.initColumns()
     }
     //执行异步任务
@@ -221,7 +202,6 @@ export default class UriHome extends Component {
             obj.apiMark = value.target.value
         }
         this.setState({ obj: obj })
-        console.log(this.state.obj)
         this.getUriList(obj)
 
 
