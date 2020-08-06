@@ -20,6 +20,7 @@ const DescriptionItem = ({ title, content }) => (
 
 export default class DoTest extends Component {
     state = {
+        tokenData:{},
         Modalvisible: false,
         data: [['1', '1', '13588096710'], ['1', '1', '13588096710'], ['1', '1', '13588096710']],
         total: 0,
@@ -51,6 +52,7 @@ export default class DoTest extends Component {
         accountValue: [],
         wxCode: [],
         wxCodeNum: 0,
+        
     };
 
 
@@ -219,7 +221,10 @@ export default class DoTest extends Component {
         }
 
     }
-
+    sxAccount=()=>{
+        let tokenData = this.state.tokenData;
+        this.getAccount(tokenData);
+    }
 
     getApiReport = async (tokenData) => {
         this.setState({ loading: true })
@@ -249,6 +254,10 @@ export default class DoTest extends Component {
 
     environmentOnChange = (value) => {
         this.setState({ environment: value })
+        let tokenData = this.state.tokenData;
+        console.log(tokenData);
+        tokenData.environment = value;
+        this.getAccount(tokenData);     
     }
     putToken = async () => {
         const { environment, accountValue, wxCodeNum, wxCode } = this.state;
@@ -367,10 +376,6 @@ export default class DoTest extends Component {
 
         const { data, apiReport, total, loading, obj, requestData, responseValueExpectResult, dotestName, account } = this.state;
         const environmentItem = storageUtils.getData('environment_key')
-
-
-
-
         const phoneList = (item, index) => {
             return (
                 <div style={{ margin: '10px 0px' }} key={index}>
@@ -387,21 +392,30 @@ export default class DoTest extends Component {
             )
         }
 
-
+        const accountTitle = (
+            <div>
+                <span style={{margin:"0px 100px 0px 0px"}}>
+                账号与环境
+                </span>
+                <span>
+              <Button color="red" style={{float:"right"}} onClick={this.sxAccount}> 
+                   <SyncOutlined spin />
+                  刷新账号
+              </Button> 
+                </span>
+            </div>
+        )
 
         const extra = (
             <div>
                 <Button type='primary' onClick={this.showModal} style={{ backgroundColor: '#9BCD9B', border: '1px solid #9BCD9B' }}>
                     <SyncOutlined spin />账号与环境
                  </Button>
-
-
                 <Button type='primary' style={{ marginLeft: '20px' }} onClick={this.doTest}>
                     <SendOutlined />{dotestName}
                 </Button>
-
                 <Modal
-                    title="账号与环境"
+                    title={accountTitle}
                     visible={this.state.Modalvisible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}

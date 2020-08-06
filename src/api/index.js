@@ -90,3 +90,11 @@ export const getReportResultTable = (obj) => ajax("/report/reportList",obj,"POST
 export const getProjectList = () =>ajax("/project",{},"GET");
 
 export const getAccountList =(obj)=>ajax('/report/account', obj ,'POST')
+
+export const addApiCaseGroup = (obj)=> ajax('/apigroup/add',obj,'POST')
+
+export const addUpdateGroupData = (id) => ajax(`/apigroup/one?id=${id}`,{},"GET")
+
+export const updateApiCaseGroup = (obj)=> ajax('/apigroup/update',obj,'POST')
+
+export const delGroup = (id) =>ajax(`/apigroup/del?id=${id}`,{},"GET")

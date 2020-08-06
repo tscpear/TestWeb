@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Card, Table, Button} from 'antd'
-import { PlusOutlined,RedoOutlined} from '@ant-design/icons'
-import { getApiGroupList } from '../../../api/index'
+import { Card, Table, Button, Modal } from 'antd'
+import { PlusOutlined, EditOutlined, DeleteOutlined,ForwardOutlined } from '@ant-design/icons'
+import { getApiGroupList, addUpdateGroupData, delGroup } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import { responseJudge } from '../../../components/public'
 
-export default class GroupHome extends Component{
+export default class GroupHome extends Component {
     state = {
         total: 0,
         list: [],
@@ -19,6 +19,7 @@ export default class GroupHome extends Component{
             limit: PAGE_SIZE
         },
         data: {},
+        Modalvisible: false,
     }
 
 
@@ -26,18 +27,11 @@ export default class GroupHome extends Component{
     initColumns = () => {
         this.columns = [
             {
-                title: '用例组编号',
+                title: '流程编号',
                 dataIndex: 'id',
                 key: 'id',
-                width: 100,
+                width: 50,
                 align: "center"
-            },
-            {
-                title: '类型',
-                dataIndex: 'groupType',
-                key: 'groupType',
-                align: "center",
-                width: 100,
             },
             {
                 title: '描述',
@@ -47,21 +41,15 @@ export default class GroupHome extends Component{
                 align: "center",
             },
             {
-                title: '涉及账号',
-                dataIndex: 'userType',
-                key: 'userType',
-                align: "center",
-                width: 100,
-            },
-            {
                 title: '操作',
                 align: 'center',
                 key: 'action',
                 width: 100,
                 render: (list) => {
                     return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={() =>  this.props.history.push('/apitest/case/dotest',list.testList)}><RedoOutlined spin style={{color:"#eb2f96"}}/></a>
-                        
+                        <a style={{ padding: "0 5px" }} onClick={ ()=>this.props.history.push('/apitest/group/do')}><ForwardOutlined/></a>
+                        <a onClick={() => this.getUpdateData(list.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
+                        <a style={{ padding: "0 5px" }} onClick={()=>this.showModal(list.id)}><DeleteOutlined twoToneColor="red" /></a>
                     </div>)
 
                 }
@@ -69,63 +57,117 @@ export default class GroupHome extends Component{
         ]
 
     }
-  //执行异步任务
-  componentDidMount() {
-    const { obj } = this.state
-    const apiList = this.props.location.state;
-    if (apiList) {
-        const apiPath = apiList.apiPath;
-        obj.apiPath = apiPath;
+    //执行异步任务
+    componentDidMount() {
+        const { obj } = this.state
+        const apiList = this.props.location.state;
+        if (apiList) {
+            const apiPath = apiList.apiPath;
+            obj.apiPath = apiPath;
+        }
+        this.getApiGroupList(obj)
     }
-    this.getApiGroupList(obj)
-}
 
+    
 
-    getApiGroupList = async(obj) =>{
+    getApiGroupList = async (obj) => {
         this.setState({ loading: true })
         const response = await getApiGroupList(obj)
         this.setState({ loading: false })
         const result = responseJudge(response);
-        if(result){
+        if (result) {
             const data = result.data;
-            this.setState({list:data})
+            this.setState({ list: data })
         }
     }
+    getUpdateData = async (id) => {
+        const obj = this.state
+        this.setState({ loading: true })
+        const response = await addUpdateGroupData(id)
+        this.setState({ loading: false })
+        const result = responseJudge(response);
+        if (result) {
+            const groupData = result.data;
+            this.props.history.push('/apitest/group/update', groupData);
+        }
+    }
+
+    delGroup = async (id) => {
+        const {obj,delId} = this.state;
+        this.setState({ loading: true })
+        const response = await delGroup(delId)
+        this.setState({ loading: false })
+        const result = responseJudge(response);
+        if (result) {
+            this.getApiGroupList(obj);
+            this.hideModal();
+        }
+    }
+    hideModal = () => {
+        this.setState({
+            Modalvisible: false,
+        });
+    };
+
+    
+    showModal = (id) => {
+        console.log('你妈妈吗');
+        this.setState({
+            Modalvisible: true,
+            delId: id,
+        });
+    };
+
     //为第一次render准备数据
     componentWillMount() {
         this.initColumns()
     }
-    render(){
+    render() {
 
 
         const { list, total, loading, obj } = this.state
 
         const extra = (
-
-            <Button type="primary" color='pick' onClick={() => this.props.history.push('/apitest/uri/add')}>
-                <PlusOutlined />
+            <div>
+                <Button type="primary" color='pick' onClick={() => this.props.history.push('/apitest/group/add')}>
+                    <PlusOutlined />
                 添加
-            </Button>
+                 </Button>
+                <Modal
+                   
+                    visible={this.state.Modalvisible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    keyboard={true}
+                    onOk={this.delGroup}
+                    onCancel={this.hideModal}
+                    okText="确定"
+                    cancelText="取消"
+                >
+                    <p style={{fontSize:"16px"}}>确定删除该流程？</p>
+                </Modal>
+            </div>
+
         )
-        return(
-            <Card  className='groupHome' >
-            <Table
-                columns={this.columns}
-                dataSource={list}
-                loading={loading}
-                bordered
-                size="small"
-                pagination={{
-                    defaultPageSize: PAGE_SIZE,
-                    total: total,
-                    onChange: (pageNum) => {
-                        obj.page = pageNum
-                        obj.limit = PAGE_SIZE
-                        this.getUriList(obj)
-                    }
-                }}
-            />
-        </Card>
+        return (
+            <Card className='groupHome' extra={extra} >
+                <Table
+                    columns={this.columns}
+                    dataSource={list}
+                    loading={loading}
+                    bordered
+                    size="small"
+                    pagination={{
+                        defaultPageSize: PAGE_SIZE,
+                        total: total,
+                        onChange: (pageNum) => {
+                            obj.page = pageNum
+                            obj.limit = PAGE_SIZE
+                            this.getUriList(obj)
+                        }
+                    }}
+                />
+            </Card>
         )
     }
 }

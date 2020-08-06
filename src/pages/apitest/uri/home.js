@@ -151,7 +151,6 @@ export default class UriHome extends Component {
     }
 
     goToApi = async (id) => {
-
         this.setState({ loading: true })
         const response = await getApiData(id)
         this.setState({ loading: false })

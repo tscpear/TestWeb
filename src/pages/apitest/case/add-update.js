@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {
     Card, Form, Input, Select, Button,
-    Tag, Radio, Checkbox, Row, Col, Switch
+    Tag, Radio, Checkbox, Row, Col, Switch,InputNumber
 } from 'antd'
 import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
@@ -49,6 +49,7 @@ export default class CaseAddUpdate extends Component {
         deviceTypeDispaly: 'none',
         responseValueExpectDisplay: 'none',
         sqlValueExpectDisplay: 'none',
+        closeCaseDisplay: 'none'
     }
 
 
@@ -79,6 +80,15 @@ export default class CaseAddUpdate extends Component {
             }
         }
         this.setState({ isRelyDisplay, headerRelyDisplay, webformRelyDisplay, bodyRelyDisplay, apiFiexdParamDisplay })
+    }
+
+    onChangeCloseCase = (e) => {
+        let display = e.target.checked;
+        if (display === true) {
+            this.setState({ closeCaseDisplay: "block" });
+        } else {
+            this.setState({ closeCaseDisplay: "none" });
+        }
     }
 
     componentDidMount() {
@@ -157,7 +167,14 @@ export default class CaseAddUpdate extends Component {
                 }
             });
         }
-
+        const preCase = data.preCase;
+        if(preCase){
+            preCase.map(item=>{
+                if(item === 2){
+                    this.setState({closeCaseDisplay:"block"});
+                }
+            })
+        }
     }
     responseValueExpectDisplayOnChange = e => {
         if (e.target.checked) {
@@ -193,6 +210,7 @@ export default class CaseAddUpdate extends Component {
             deviceTypeDispaly,
             responseValueExpectDisplay,
             sqlValueExpectDisplay,
+            closeCaseDisplay,
         } = this.state;
 
         //一级方法
@@ -247,7 +265,7 @@ export default class CaseAddUpdate extends Component {
                                                     filterOption={false}
                                                     placeholder="go"
                                                     notFoundContent={null}
-                                                    
+
 
                                                 >
                                                     {getOptionMark(index)}
@@ -401,13 +419,13 @@ export default class CaseAddUpdate extends Component {
                 result = responseJudge(response);
                 if (result) {
                     this.props.history.goBack();
-                } 
+                }
             } else {
                 response = await addApiCaseData(values);
-                result =responseJudge(response);
+                result = responseJudge(response);
                 if (result) {
                     this.props.history.goBack();
-                } 
+                }
             }
 
         }
@@ -439,7 +457,7 @@ export default class CaseAddUpdate extends Component {
             const device = data.deviceTypeList;
             let option = [];
             device.map((item, index) => {
-                option.push(<Radio value={index+1} key={index+1}><Tag color='magenta'>{item}</Tag></Radio>)
+                option.push(<Radio value={index + 1} key={index + 1}><Tag color='magenta'>{item}</Tag></Radio>)
             })
             return option;
         }
@@ -525,7 +543,6 @@ export default class CaseAddUpdate extends Component {
                                     {second('headerRelyToHandle')}
                                 </div>
                             </div>
-
                         </Form.Item>
                     </div>
                     <div style={{ display: webformParamDisplay, width: '100%' }} >
@@ -543,6 +560,19 @@ export default class CaseAddUpdate extends Component {
                             </div>
                         </Form.Item>
                     </div>
+                    <Form.Item className='item' label='前置用例' name='preCase'>
+                        <Checkbox.Group>
+                            <Checkbox value={1} disabled={true}><Tag color="green">超前置用例</Tag></Checkbox>
+                            <Checkbox value={2} onChange={this.onChangeCloseCase}><Tag color="geekblue">贴身前置用例</Tag></Checkbox>
+                        </Checkbox.Group>
+                    </Form.Item>
+                    <div style={{ display: closeCaseDisplay, width: '100%' }}>
+                        <Form.Item className='item' label = "贴身前置" name = "closeCase">
+                           <InputNumber maxLength="3"  className='do'/>
+                        </Form.Item>
+                    </div>
+
+
                     <div style={{ display: bodyParamDisplay, width: '100%' }} >
                         <Form.Item label='json参数' className='itemss'>
                             <div style={{ width: '45%', display: 'inline-block', verticalAlign: 'top', padding: '0px 35px 0px 0px' }}>
