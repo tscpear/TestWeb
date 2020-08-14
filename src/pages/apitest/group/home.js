@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Table, Button, Modal } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined,ForwardOutlined } from '@ant-design/icons'
-import { getApiGroupList, addUpdateGroupData, delGroup } from '../../../api/index'
+import { getApiGroupList, addUpdateGroupData, delGroup,getDoGroupData } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import { responseJudge } from '../../../components/public'
@@ -41,13 +41,20 @@ export default class GroupHome extends Component {
                 align: "center",
             },
             {
+                title: '定时任务',
+                dataIndex: 'groupMark',
+                key: 'groupMark',
+                width: 100,
+                align: "center",
+            },
+            {
                 title: '操作',
                 align: 'center',
                 key: 'action',
                 width: 100,
                 render: (list) => {
                     return (<div >
-                        <a style={{ padding: "0 5px" }} onClick={ ()=>this.props.history.push('/apitest/group/do')}><ForwardOutlined/></a>
+                        <a style={{ padding: "0 5px" }} onClick={ ()=>this.goToDo(list.id)}><ForwardOutlined/></a>
                         <a onClick={() => this.getUpdateData(list.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
                         <a style={{ padding: "0 5px" }} onClick={()=>this.showModal(list.id)}><DeleteOutlined twoToneColor="red" /></a>
                     </div>)
@@ -69,6 +76,16 @@ export default class GroupHome extends Component {
     }
 
     
+    goToDo=async(id)=>{
+        this.setState({ loading: true })
+        const response = await getDoGroupData(id) 
+        this.setState({ loading: false })
+        const result = responseJudge(response);
+        if (result) {
+            const data = result.data;
+            this.props.history.push('/apitest/group/do',data)
+        }
+    }
 
     getApiGroupList = async (obj) => {
         this.setState({ loading: true })
@@ -111,7 +128,6 @@ export default class GroupHome extends Component {
 
     
     showModal = (id) => {
-        console.log('你妈妈吗');
         this.setState({
             Modalvisible: true,
             delId: id,

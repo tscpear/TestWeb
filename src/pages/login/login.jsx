@@ -95,7 +95,7 @@ export default class Login extends Component {
                         <div className='login-form-title-right'>
                             <Select
                                 onChange={this.selectProject}
-                                style={{ width: 240 }}
+                                style={{ width: '100%' }}
                                 placeholder="请选择对应的项目"
                                 dropdownRender={menu => (
                                     <div>

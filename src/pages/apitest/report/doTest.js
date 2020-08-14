@@ -160,19 +160,6 @@ export default class DoTest extends Component {
 
 
             },
-
-            // {
-            //     title: '操作',
-            //     align: 'center',
-            //     key: 'action',
-            //     width: 100,
-            //     render: (apiReport) => {
-            //         return (<div >
-            //             <a style={{ padding: "0 5px" }} onClick={() => this.showDrawer(apiReport)}><FileSearchOutlined /></a>
-            //         </div>)
-
-            //     }
-            // }
         ]
 
     }
@@ -205,6 +192,7 @@ export default class DoTest extends Component {
 
     getAccount = async (tokenData) => {
         const { environment, reportId } = this.state;
+        console.log(environment)
         if (reportId !== 0) {
             tokenData.reportId = reportId;
         }
@@ -253,11 +241,11 @@ export default class DoTest extends Component {
 
 
     environmentOnChange = (value) => {
-        this.setState({ environment: value })
-        let tokenData = this.state.tokenData;
-        console.log(tokenData);
-        tokenData.environment = value;
-        this.getAccount(tokenData);     
+        console.log(value);
+        this.setState({ environment: value },()=>{
+            let tokenData = this.state.tokenData;
+            this.getAccount(tokenData);     
+        })       
     }
     putToken = async () => {
         const { environment, accountValue, wxCodeNum, wxCode } = this.state;
@@ -273,6 +261,7 @@ export default class DoTest extends Component {
     }
     doTest = async () => {
         const { environment, tokenData, reportId, accountValue } = this.state;
+    
         if (reportId !== 0) {
             tokenData.reportId = reportId;
         }

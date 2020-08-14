@@ -98,3 +98,7 @@ export const addUpdateGroupData = (id) => ajax(`/apigroup/one?id=${id}`,{},"GET"
 export const updateApiCaseGroup = (obj)=> ajax('/apigroup/update',obj,'POST')
 
 export const delGroup = (id) =>ajax(`/apigroup/del?id=${id}`,{},"GET")
+
+export const getDoGroupData = (id) => ajax(`/apigroup/ready?id=${id}`,{},"GET")
+
+export const doGroupOne = (obj) => ajax('/apigroup/doOne',obj,'POST')
