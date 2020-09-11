@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {
     Card, Form, Input, Select, Button,
-    Tag, Radio, Checkbox, Row, Col, Switch,InputNumber
+    Tag, Radio, Checkbox, Row, Col, Switch, InputNumber
 } from 'antd'
 import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import '../index.less'
@@ -40,8 +40,8 @@ export default class CaseAddUpdate extends Component {
         webformRelyDisplay: 'none',
         bodyRelyDisplay: 'none',
         rules: [{
-            required: true,
-            whitespace: true,
+            required: false,
+            whitespace: false,
             message: "这你都不填，你以为你是客服吗！",
         },],
         relyTestMarkValue: null,
@@ -92,14 +92,20 @@ export default class CaseAddUpdate extends Component {
     }
 
     componentDidMount() {
+
         const data = this.props.location.state;
+        const rules = [{
+            required: true,
+            whitespace: true,
+            message: "这你都不填，你以为你是客服吗！",
+        },];
         this.setState({ data });
         const apiParamType = data.apiParamType;
         const isDepend = data.isDepend
         if (data.id) {
             this.setState({ title: '编辑用例', className: 'myform contentMaxHeight caseadd' })
         } else {
-            this.setState({ title: '新增用例', className: 'myform contentMaxHeight caseupdate' })
+            this.setState({ title: '新增用例', className: 'myform contentMaxHeight caseupdate',rules })
         }
 
 
@@ -168,10 +174,10 @@ export default class CaseAddUpdate extends Component {
             });
         }
         const preCase = data.preCase;
-        if(preCase){
-            preCase.map(item=>{
-                if(item === 2){
-                    this.setState({closeCaseDisplay:"block"});
+        if (preCase) {
+            preCase.map(item => {
+                if (item === 2) {
+                    this.setState({ closeCaseDisplay: "block" });
                 }
             })
         }
@@ -500,18 +506,18 @@ export default class CaseAddUpdate extends Component {
                     <Form.Item className='item' label='用例描述' name='apiCaseMark' rules={rules}>
                         <Input className='do' />
                     </Form.Item>
-                    <Form.Item className='item' label='用例类型' name='apiCaseType' rules={rules}>
+                    <Form.Item className='item' label='用例类型' name='apiCaseType'>
                         <Radio.Group>
-                            <Radio value='1'><Tag color="green">正常使用</Tag></Radio>
-                            <Radio value='2'><Tag color="geekblue">重在回归</Tag></Radio>
-                            <Radio value='3'><Tag color="red">创建数据</Tag></Radio>
+                            <Radio value={1}><Tag color="green">正常使用</Tag></Radio>
+                            <Radio value={2}><Tag color="geekblue">重在回归</Tag></Radio>
+                            <Radio value={3}><Tag color="red">创建数据</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item className='item' label='用例等级' name='apiCaseLv' rules={rules} >
+                    <Form.Item className='item' label='用例等级' name='apiCaseLv' >
                         <Radio.Group>
-                            <Radio value='1'><Tag color="green">无关紧要</Tag></Radio>
-                            <Radio value='2'><Tag color="geekblue">一般般啦</Tag></Radio>
-                            <Radio value='3'><Tag color="red">叼的一匹</Tag></Radio>
+                            <Radio value={1}><Tag color="green">无关紧要</Tag></Radio>
+                            <Radio value={2}><Tag color="geekblue">一般般啦</Tag></Radio>
+                            <Radio value={3}><Tag color="red">叼的一匹</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
 
@@ -567,8 +573,8 @@ export default class CaseAddUpdate extends Component {
                         </Checkbox.Group>
                     </Form.Item>
                     <div style={{ display: closeCaseDisplay, width: '100%' }}>
-                        <Form.Item className='item' label = "贴身前置" name = "closeCase">
-                           <InputNumber maxLength="3"  className='do'/>
+                        <Form.Item className='item' label="贴身前置" name="closeCase">
+                            <InputNumber maxLength="3" className='do' />
                         </Form.Item>
                     </div>
 
@@ -604,12 +610,13 @@ export default class CaseAddUpdate extends Component {
                             <Select.Option value='500'>500</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item className='item' label='其他断言' name='otherAssertionType'>
+                    <Form.Item className='item' label='其他断言' name='otherAssertionType' style={{width:'80%'}}>
                         <Checkbox.Group >
                             <Checkbox value='1'><Tag color="purple">返回值结构断言</Tag></Checkbox>
                             <Checkbox value='2' onChange={this.responseValueExpectDisplayOnChange}><Tag color="purple">特定返回值断言</Tag></Checkbox>
                             <Checkbox value='3' onChange={this.sqlValueExpectDisplayOnChange}><Tag color="red">数据落库字段值断言</Tag></Checkbox>
-                            <Checkbox value='4'><Tag color="green">返回值与数据库比对断言</Tag></Checkbox>
+                            <Checkbox value='4'><Tag color="red">返回值与数据库比对断言</Tag></Checkbox>
+                            <Checkbox value='5'><Tag color="green">双接口返回值断言</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
                     <div style={{ display: responseValueExpectDisplay, width: '50%' }}>

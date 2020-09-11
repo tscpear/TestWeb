@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {
-    Card, Form, Input, Button,Modal,
+    Card, Form, Input, Button, Modal,
     Row, Col,
 } from 'antd'
+import '../index.less'
 import { addApiCaseGroup, updateApiCaseGroup } from '../../../api/index'
 import { responseJudge } from '../../../components/public'
 export default class GroupAddAndUpdate extends Component {
@@ -68,8 +69,9 @@ export default class GroupAddAndUpdate extends Component {
 
 
             <Card
+                className='groupadd myform'
                 title={title}
-                className={this.state.className}>
+            >
                 <Form
                     name='form'
                     onFinish={onFinish}
@@ -78,7 +80,7 @@ export default class GroupAddAndUpdate extends Component {
                     {...forms()}
                 >
                     <Form.Item name="groupMark">
-                        <Input placeholder="流程描述" />
+                        <Input placeholder="流程描述"  className='do'/>
                     </Form.Item>
                     <Form.List name='caseList'>
                         {(fields, { add, remove }) => {
@@ -91,7 +93,7 @@ export default class GroupAddAndUpdate extends Component {
                                                     name={[field.name, 'caseList']}
                                                     fieldKey={[field.fieldKey, 'caseList']}
                                                 >
-                                                    <Input placeholder="请按顺序输入测试用例的ID" />
+                                                    <Input placeholder="请按顺序输入测试用例的ID" style={{ width: "300px" }}  className='do'/>
                                                 </Form.Item>
                                             </Col>
                                             <Col style={{ padding: '0px 10px' }}>
@@ -99,7 +101,7 @@ export default class GroupAddAndUpdate extends Component {
                                                     name={[field.name, 'groupMark']}
                                                     fieldKey={[field.fieldKey, 'groupMark']}
                                                 >
-                                                    <Input placeholder="描述" />
+                                                    <Input placeholder="描述"  className='do'/>
                                                 </Form.Item>
                                             </Col>
                                             <Col flex="none" style={{ width: '10%' }} >

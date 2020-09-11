@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Card, Table, Button, Tag, Select, Input } from 'antd'
-import {  EditOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { Card, Table, Button, Tag, Select, Input ,Modal} from 'antd'
+import { EditOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { getApiCaseData, getApiCaseList, delApiCaseData } from '../../../api/index'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
@@ -50,7 +50,19 @@ export default class ApiCaseHome extends Component {
             })
         }
     }
+    hideModal = () => {
+        this.setState({
+            Modalvisible: false,
+        });
+    };
 
+    
+    showModal = (id) => {
+        this.setState({
+            Modalvisible: true,
+            delId: id,
+        });
+    };
 
     //初始化所有的列
     initColumns = () => {
@@ -162,7 +174,7 @@ export default class ApiCaseHome extends Component {
                     return (<div >
                         {/* <a style={{ padding: "0 5px" }} onClick={() => this.addCase(apiCaseList.id)}><PlusOutlined /></a> */}
                         <a style={{ padding: "0 5px" }} onClick={() => this.goToCase(apiCaseList.id)} style={{ padding: "0 5px" }}><EditOutlined /></a>
-                        <a style={{ padding: "0 5px" }} onClick={() => this.delApi(apiCaseList.id)}><DeleteOutlined twoToneColor="red" />
+                        <a style={{ padding: "0 5px" }} onClick={() => this.showModal(apiCaseList.id)}><DeleteOutlined twoToneColor="red" />
                         </a>
                     </div>)
 
@@ -172,15 +184,16 @@ export default class ApiCaseHome extends Component {
 
     }
 
-    delApi = async (id) => {
-        const { obj } = this.state;
+    delApi = async () => {
+        const {obj,delId} = this.state;
         const userId = memoryUtils.user.id;
         this.setState({ loading: true })
-        const response = await delApiCaseData(id, userId)
+        const response = await delApiCaseData(delId, userId)
         this.setState({ loading: false })
         const result = responseJudge(response);
         if (result) {
-            this.getApiCaseList(obj)
+            this.getApiCaseList(obj);
+            this.hideModal();
         }
     }
 
@@ -221,7 +234,7 @@ export default class ApiCaseHome extends Component {
             obj.apiPath = value.target.value
         } else if (type === 3) {
             obj.apiCaseMark = value.target.value
-        }else if (type === 4){
+        } else if (type === 4) {
             obj.apiCaseType = value;
         }
         this.setState({ obj: obj })
@@ -293,12 +306,28 @@ export default class ApiCaseHome extends Component {
 
 
         const extra = (
-            <Button type="primary" onClick={() => this.props.history.push('/apitest/case/dotest', selectedTestId)} disabled={
-                selectedRowKeys.length === 0 ? true : false
-            }>
-                <PlayCircleOutlined />
+            <div>
+                <Button type="primary" onClick={() => this.props.history.push('/apitest/case/dotest', selectedTestId)} disabled={
+                    selectedRowKeys.length === 0 ? true : false
+                }>
+                    <PlayCircleOutlined />
                 执行用例
             </Button>
+            <Modal
+                   
+                   visible={this.state.Modalvisible}
+                   onOk={this.handleOk}
+                   onCancel={this.handleCancel}
+                   keyboard={true}
+                   onOk={this.delApi}
+                   onCancel={this.hideModal}
+                   okText="确定"
+                   cancelText="取消"
+               >
+                   <p style={{fontSize:"16px"}}>确定删除该流程？</p>
+               </Modal>
+            </div>
+
         )
         const showTotal = (total, range) => {
             return "共 " + total + " 条"

@@ -114,6 +114,7 @@ export default class AddUpdata extends Component {
                 webformFiexdParamDisplay = 'inline-block';
             }
             if (item === '2' && device !== 0) {
+                console.log("你妈妈吗");
                 webformRelyParamDisplay = 'inline-block';
             }
             if (item === '3' && device !== 0) {
@@ -159,12 +160,15 @@ export default class AddUpdata extends Component {
 
     componentDidMount = () => {
         const apiData = this.props.location.state;
-        // this.setState({device:apiData.device});
+        let device ;
+
         if (apiData && apiData.id) {
-            this.setState({ title: "编   辑" });
-            this.headerParamTypeOnChange(apiData.headerParamType);
-            this.webformParamTypeOnChange(apiData.webformParamType);
-            this.bodyParamTypeOnChange(apiData.bodyParamType);
+            this.setState({ title: "编   辑",device },()=>{
+                device = apiData.device;
+                this.headerParamTypeOnChange(apiData.headerParamType);
+                this.webformParamTypeOnChange(apiData.webformParamType);
+                this.bodyParamTypeOnChange(apiData.bodyParamType);
+            });         
             switch (apiData.apiParamType) {
                 case "1":
                     this.setState({ apiFiexdDispaly: 'block' });

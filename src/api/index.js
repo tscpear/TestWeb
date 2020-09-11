@@ -102,3 +102,7 @@ export const delGroup = (id) =>ajax(`/apigroup/del?id=${id}`,{},"GET")
 export const getDoGroupData = (id) => ajax(`/apigroup/ready?id=${id}`,{},"GET")
 
 export const doGroupOne = (obj) => ajax('/apigroup/doOne',obj,'POST')
+
+export const doHouse = (value) => ajax(`/createData/tire/house?tireId=${value.tireId}&num=${value.num}&environment=${value.environment}`)
+
+export const completeStoreOrder = (value) => ajax(`/createData/tire/completeStoreOrder?orderSn=${value.orderSn}&environment=${value.environment}&type=${value.type}`)

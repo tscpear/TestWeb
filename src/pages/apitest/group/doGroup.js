@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import { ArrowLeftOutlined, MinusCircleOutlined, UserOutlined, StopOutlined, LockOutlined, SendOutlined, SyncOutlined } from '@ant-design/icons';
 import {
     Card, Form, Input, Button, Modal,
-    Row, Col, Steps, Timeline, Select, Tag, message,Collapse,Table,Divider
-,Drawer} from 'antd'
-import { putToken, getAccountList, doGroupOne,getOneReport } from '../../../api/index'
-import { responseJudge } from '../../../components/public'
+    Row, Col, Steps, Timeline, Select, Tag, message, Collapse, Table, Divider
+    , Drawer
+} from 'antd'
+import { putToken, getAccountList, doGroupOne, getOneReport } from '../../../api/index'
+import { deviceNameOfList, deviceColorOfList, responseJudge } from '../../../components/public'
 import storageUtils from '../../../utils/storageUtils'
 import './../index.less'
 const DescriptionItem = ({ title, content }) => (
@@ -123,6 +124,7 @@ export default class DoGroup extends Component {
             let success = item.success;
             let apiCaseId = item.apiCaseId;
             let id = item.id;
+            let device = item.device;
             const color = () => {
 
                 switch (success) {
@@ -135,12 +137,13 @@ export default class DoGroup extends Component {
                 }
             }
             let disables = true;
-            if(id){
+            if (id) {
                 disables = false;
             }
-            let timelines = (<Timeline.Item dot={<a onClick={()=>this.showDrawer(id)} disabled= {disables}>
-                <Tag color={color()} style={{ margin: '0px' }}>{apiCaseId}</Tag>
-            </a>} color="gray">{name}</Timeline.Item>)
+            let timelines = (<Timeline.Item dot={<a onClick={() => this.showDrawer(id)} disabled={disables} style={{ width: '100%' }}>
+                <Tag color={color()} style={{ marginTop: '0px', height: 'auto' }}>{apiCaseId}</Tag>
+            </a>} color="gray">
+                <Tag color={deviceColorOfList(device)} key={device}>{deviceNameOfList(device)}</Tag>{name}</Timeline.Item>)
             option.push(timelines);
         })
         return option;
@@ -220,26 +223,28 @@ export default class DoGroup extends Component {
 
     doAll = async () => {
         const { num, id, environment, accountValue } = this.state;
-
+        console.log(num);
         var next = true;
         var i;
         for (i = 1; i <= num; i++) {
-            if (next) {
+            if (next === true) {
                 var reportId = this.state.reportId;
                 console.log(reportId)
                 var obj = Object.assign({ 'groupId': id, 'teamId': i, "environment": environment, 'accountValue': accountValue, "reportId": reportId })
                 next = await this.doOne(obj);
-                console.log(next)
                 this.setState({ step: i });
-            } else {
-                i--;
-                console.log(next)
-                message.error("流程中断")
-                break;
-            }
+                if (next === false) {
+                    i--;
+                    message.error("流程中断")
+                    break;
+                }
+            }    
         }
-        if (i === num) {
+        console.log(num);
+        console.log(i)
+        if (i > num) {
             this.setState({ stepStatus: "finish" });
+            message.success("执行完毕")
         } else {
             this.setState({ stepStatus: "error" });
         }
@@ -287,7 +292,7 @@ export default class DoGroup extends Component {
         this.environmentOnChange(1);
     }
     render() {
-        const { dotestName, account, environmentItem, bigTitle, step, stepStatus,requestData } = this.state;
+        const { dotestName, account, environmentItem, bigTitle, step, stepStatus, requestData } = this.state;
         const accountTitle = (
             <div>
                 <span style={{ margin: "0px 100px 0px 0px" }}>
@@ -402,7 +407,7 @@ export default class DoGroup extends Component {
         ];
         return (
             <Card style={{ height: "100%" }} title={card} extra={extra} className='groupDo myform'>
-                <Steps current={step} percent={60} direction="vertical" status={stepStatus}>
+                <Steps current={step} percent={60} direction="vertical" status={stepStatus} >
                     {this.step()}
                 </Steps>
                 <Drawer
@@ -468,7 +473,7 @@ export default class DoGroup extends Component {
                     <p className="site-description-item-profile-p" style={{ color: "green" }}> 返回值</p>
                     <pre><code id="json">  {JSON.stringify(requestData.response, undefined, 2)}</code></pre>
                 </Drawer>
-                
+
             </Card>
         )
     }
