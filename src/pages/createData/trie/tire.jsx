@@ -56,8 +56,8 @@ export default class Tire extends Component {
                 <div style={{ margin: '20px' }}>
                     <Select autoFocus='true' style={{ width: '100px' }} defaultValue={1} onChange={this.environmentOnChange}>
                         <Select.Option value={1}>准生产</Select.Option>
-                        <Select.Option value={2}>测试次</Select.Option>
-                        <Select.Option value={3}>测试主</Select.Option>
+                        <Select.Option value={2}>测试主</Select.Option>
+                        <Select.Option value={3}>测试次</Select.Option>
                     </Select>
                 </div>
                 <div style={{ margin: '20px', padding: '20px', border: '2px solid grey' }}>
