@@ -50,24 +50,28 @@ class LeftNav extends Component {
     }
     //再第一次runder之前 执行一次
     //为第一个 准备数据  
- 
+
     UNSAFE_componentWillMount() {
         this.menuNodes = this.getMenuNodes(menuList)
     }
 
     render() {
         let path = this.props.location.pathname
-        if(path.indexOf('/apitest/uri')===0){
+        if (path.indexOf('/apitest/uri') === 0) {
             path = '/apitest/uri'
-        }else if(path.indexOf('/apitest/case')===0){
+        } else if (path.indexOf('/apitest/case') === 0) {
             path = '/apitest/case'
-        }else if(path.indexOf('/apitest/report')===0){
+        } else if (path.indexOf('/apitest/report') === 0) {
             path = '/apitest/report'
-        }else if(path.indexOf('/apitest/group')===0){
+        } else if (path.indexOf('/apitest/group') === 0) {
             path = '/apitest/group'
-        }else if(path.indexOf('/createdata/tire')===0){
+        } else if (path.indexOf('/createdata/tire') === 0) {
             path = '/createdata/tire'
-        }else{
+        } else if (path.indexOf('/guiTest/case') === 0) {
+            path = '/guiTest/case'
+        } else if (path.indexOf('/guiTest/test') === 0) {
+            path = '/guiTest/test'
+        } else {
 
         }
         const openKey = this.openKey

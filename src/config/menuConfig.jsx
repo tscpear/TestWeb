@@ -1,12 +1,12 @@
 import React from 'react';
-import {HomeOutlined,SecurityScanOutlined,StarTwoTone,FireTwoTone,CrownTwoTone } from '@ant-design/icons';
+import { HomeOutlined, SecurityScanOutlined, StarTwoTone, FireTwoTone, CrownTwoTone } from '@ant-design/icons';
 
 
 const menuList = [
     {
         title: '首页',
         key: '/home',
-        icon: <HomeOutlined/>
+        icon: <HomeOutlined />
     },
     {
         title: '接口测试管理',
@@ -24,20 +24,36 @@ const menuList = [
                 icon: <StarTwoTone twoToneColor="white" />
             },
             {
-                title:'接口流程',
-                key:'/apitest/group',
+                title: '接口流程',
+                key: '/apitest/group',
                 icon: <StarTwoTone twoToneColor="white" />
             },
             {
-                title:'报告管理',
-                key:'/apitest/report',
+                title: '报告管理',
+                key: '/apitest/report',
                 icon: <StarTwoTone twoToneColor="white" />
             }
         ]
-    },  {
+    }, {
+        title: '界面测试管理',
+        key: '/guiTest',
+        icon: <SecurityScanOutlined twoToneColor="white" />,
+        children: [
+            {
+                title: '事件管理',
+                key: '/guiTest/case',
+                icon: <StarTwoTone twoToneColor="white" />
+            },
+            {
+                title: '测试页面',
+                key: '/guiTest/test',
+                icon: <StarTwoTone twoToneColor="white" />
+            },
+        ]
+    }, {
         title: '创建测试数据',
         key: '/ceatedata',
-        icon: <CrownTwoTone  twoToneColor="white"/>,
+        icon: <CrownTwoTone twoToneColor="white" />,
         children: [
             {
                 title: '网红轮胎数据',

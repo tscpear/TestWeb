@@ -8,7 +8,7 @@ import ajax from './ajax'
 
 
 
-export const reqLogin = (username, password,projectId) => ajax('/login', { username, password,projectId }, 'POST')
+export const reqLogin = (username, password, projectId) => ajax('/login', { username, password, projectId }, 'POST')
 
 export const getApiUriList = (obj) => {
     let url = `/api/list?page=${obj.page}&limit=${obj.limit}`
@@ -46,12 +46,12 @@ export const getApiCaseList = (obj) => {
     if (obj.device && obj.device !== '0') {
         url = url + `&device=${obj.device}`
     }
-    if(obj.apiId && obj.apiId !== 0){
+    if (obj.apiId && obj.apiId !== 0) {
         url = url + `&apiId=${obj.apiId}`
     }
-    if(obj.apiCaseType && obj.apiCaseType !==0){
+    if (obj.apiCaseType && obj.apiCaseType !== 0) {
         url = url + `&apiCaseType=${obj.apiCaseType}`
-    }   
+    }
 
 
     return ajax(url, {}, 'GET');
@@ -67,42 +67,50 @@ export const delApiCaseData = (id, userId) => ajax(`/apicase/del?id=${id}&userId
 
 export const getApiReport = (testIdList) => ajax('/report/list', testIdList, "POST")
 
-export const getApiHomeList = (obj) => ajax(`/report/mainList?page=${obj.page}&limit=${obj.limit}`,{},"GET")
+export const getApiHomeList = (obj) => ajax(`/report/mainList?page=${obj.page}&limit=${obj.limit}`, {}, "GET")
 
-export const searchTest =   (value) => ajax(`/api/searchRely?path=${value}`, {}, 'GET')
+export const searchTest = (value) => ajax(`/api/searchRely?path=${value}`, {}, 'GET')
 
-export const searchTestName = (value,device) => ajax(`/api/searchRelyName?path=${value}&device=${device}`, {}, 'GET')
+export const searchTestName = (value, device) => ajax(`/api/searchRelyName?path=${value}&device=${device}`, {}, 'GET')
 
 export const getApiGroupList = (obj) => {
     let url = `/apigroup/list?page=${obj.page}&limit=${obj.limit}`
     return ajax(url, {}, 'GET')
 }
-export const putToken = (obj) =>ajax("/report/token",obj,"POST")
+export const putToken = (obj) => ajax("/report/token", obj, "POST")
 
-export const doTest = (obj) => ajax("/report/do",obj,"POST");
+export const doTest = (obj) => ajax("/report/do", obj, "POST");
 
-export const getOneReport = (id) => ajax(`/report/one?id=${id}`,{},'GET')
+export const getOneReport = (id) => ajax(`/report/one?id=${id}`, {}, 'GET')
 
-export const crateDataTire = (value,environment) =>ajax(`/createData/tire?orderSn=${value}&environment=${environment}`,{},'GET')
+export const crateDataTire = (value, environment) => ajax(`/createData/tire?orderSn=${value}&environment=${environment}`, {}, 'GET')
 
-export const getReportResultTable = (obj) => ajax("/report/reportList",obj,"POST");
+export const getReportResultTable = (obj) => ajax("/report/reportList", obj, "POST");
 
-export const getProjectList = () =>ajax("/project",{},"GET");
+export const getProjectList = () => ajax("/project", {}, "GET");
 
-export const getAccountList =(obj)=>ajax('/report/account', obj ,'POST')
+export const getAccountList = (obj) => ajax('/report/account', obj, 'POST')
 
-export const addApiCaseGroup = (obj)=> ajax('/apigroup/add',obj,'POST')
+export const addApiCaseGroup = (obj) => ajax('/apigroup/add', obj, 'POST')
 
-export const addUpdateGroupData = (id) => ajax(`/apigroup/one?id=${id}`,{},"GET")
+export const addUpdateGroupData = (id) => ajax(`/apigroup/one?id=${id}`, {}, "GET")
 
-export const updateApiCaseGroup = (obj)=> ajax('/apigroup/update',obj,'POST')
+export const updateApiCaseGroup = (obj) => ajax('/apigroup/update', obj, 'POST')
 
-export const delGroup = (id) =>ajax(`/apigroup/del?id=${id}`,{},"GET")
+export const delGroup = (id) => ajax(`/apigroup/del?id=${id}`, {}, "GET")
 
-export const getDoGroupData = (id) => ajax(`/apigroup/ready?id=${id}`,{},"GET")
+export const getDoGroupData = (id) => ajax(`/apigroup/ready?id=${id}`, {}, "GET")
 
-export const doGroupOne = (obj) => ajax('/apigroup/doOne',obj,'POST')
+export const doGroupOne = (obj) => ajax('/apigroup/doOne', obj, 'POST')
 
-export const doHouse = (value) => ajax(`/createData/tire/house?tireId=${value.tireId}&num=${value.num}&environment=${value.environment}`)
+export const doHouse = (value) => ajax(`/createData/tire/house?tireId=${value.tireId}&num=${value.num}&environment=${value.environment}`, {}, "GET")
 
-export const completeStoreOrder = (value) => ajax(`/createData/tire/completeStoreOrder?orderSn=${value.orderSn}&environment=${value.environment}&type=${value.type}`)
+export const completeStoreOrder = (value) => ajax(`/createData/tire/completeStoreOrder?orderSn=${value.orderSn}&environment=${value.environment}&type=${value.type}`, {}, "GET")
+
+export const addGuiData = (obj) => ajax("/gui/add", obj, "POST")
+
+export const getGuiList = () => ajax("/gui/list", {}, "GET")
+
+export const getOneGuiData = (id) =>ajax(`/gui/getOne?id=${id}`,{},"GET")
+
+export const updateGuiData = (obj) =>ajax('/gui/update',obj,'POST')
