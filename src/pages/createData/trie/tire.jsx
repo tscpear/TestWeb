@@ -41,7 +41,8 @@ export default class Tire extends Component {
             const response = await completeStoreOrder(value);
         }
         const onFinish4 = async (value) => {
-            value = Object.assign(value, { environment: this.state.environment, type: 3 });
+            value = Object.assign(value, { environment: this.state.environment, type: 4 });
+            console.log(value);
             const response = await completeStoreOrder(value);
         }
 
@@ -125,7 +126,7 @@ export default class Tire extends Component {
                         onFinish={onFinish4}
                         labelAlign='left'
                     >
-                        <Form.Item className='item' label='司机订单号' name='driver' >
+                        <Form.Item className='item' label='司机订单号' name='orderSn' >
                             <Input className='do' />
                         </Form.Item>
                         <Form.Item className='item' >

@@ -192,9 +192,12 @@ export default class AddUpdata extends Component {
         if (this.props.location.state) {
             return this.props.location.state.isRely
         }
+    }
 
-
-
+    more = () =>{
+        if (this.props.location.state) {
+            return this.props.location.state.more
+        }  
     }
 
     apiRelySearch = value => {
@@ -560,6 +563,9 @@ export default class AddUpdata extends Component {
                             <Select.Option value={0}>请选择设备</Select.Option>
                             {deviceSelect()}
                         </Select>
+                    </Form.Item>
+                    <Form.Item label='复数接口' className='item' name='more'>
+                        <Switch  defaultChecked={this.more()}/>
                     </Form.Item>
                     <Form.Item className='item' label='请求方式' name='apiMethod'>
                         <Radio.Group>
