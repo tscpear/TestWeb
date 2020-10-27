@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { crateDataTire, doHouse, completeStoreOrder } from '../../../api/index'
 import { Card, message, Select, Input, Button, Form } from 'antd'
 import '../../apitest/index.less'
+import { deviceSelect, responseJudge } from '../../../components/public'
 export default class Tire extends Component {
     state = {
         environment: 1,
@@ -31,20 +32,33 @@ export default class Tire extends Component {
         const onFinish1 = async (value) => {
             value = Object.assign(value, { environment: this.state.environment });
             const response = await doHouse(value);
+            responseJudge(response);
+
         }
         const onFinish2 = async (value) => {
             value = Object.assign(value, { environment: this.state.environment, type: 2 });
             const response = await completeStoreOrder(value);
+            responseJudge(response);
         }
         const onFinish3 = async (value) => {
             value = Object.assign(value, { environment: this.state.environment, type: 3 });
             const response = await completeStoreOrder(value);
+            responseJudge(response);
         }
         const onFinish4 = async (value) => {
             value = Object.assign(value, { environment: this.state.environment, type: 4 });
             console.log(value);
             const response = await completeStoreOrder(value);
+            responseJudge(response);
         }
+        const onFinish5 = async (value) => {
+            value = Object.assign(value, { environment: this.state.environment, type: 5 });
+            console.log(value);
+            const response = await completeStoreOrder(value);
+            console.log(response)
+            responseJudge(response);
+        }
+
 
 
 
@@ -133,6 +147,25 @@ export default class Tire extends Component {
                             <Button type="primary" htmlType="submit" style={{ backgroundColor: 'yellow', color: 'black', margin: '0px 10px' }}>
                                 司机完成线上订单
                         </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+                <div style={{ margin: '20px', padding: '20px', border: '2px solid grey' }}>
+                    <Form
+                        name='form'
+                        layout='inline'
+                        hideRequiredMark={true}
+                        onFinish={onFinish5}
+                        labelAlign='left'
+                    >
+                        <Form.Item className='item' label='司机手机号' name='orderSn' >
+                            <Input className='do' maxLength={11}/>
+                        </Form.Item>
+                        <Form.Item className='item' >
+                            <Button type="primary" htmlType="submit" style={{ backgroundColor: 'yellow', color: 'black', margin: '0px 10px' }}>
+                            发放三包抵扣券
+                        </Button>
+                        <h>确保司机有质保中的质保卡</h>
                         </Form.Item>
                     </Form>
                 </div>
