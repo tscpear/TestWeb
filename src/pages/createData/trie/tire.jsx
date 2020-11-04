@@ -7,6 +7,9 @@ export default class Tire extends Component {
     state = {
         environment: 1,
         loading: false,
+        lpsn: "",
+        lpsnDispaly:"none",
+        
     }
 
 
@@ -29,6 +32,8 @@ export default class Tire extends Component {
     }
 
     render() {
+        const { loading, lpsn,lpsnDispaly } = this.state;
+    
         const onFinish1 = async (value) => {
             value = Object.assign(value, { environment: this.state.environment });
             const response = await doHouse(value);
@@ -58,11 +63,26 @@ export default class Tire extends Component {
             console.log(response)
             responseJudge(response);
         }
+        const onFinish6 = async (value) => {
+            value = Object.assign(value, { environment: this.state.environment, type: 6 });
+            console.log(value);
+            const response = await completeStoreOrder(value);
+            console.log(response)
+            const data = responseJudge(response).data;
+            this.setState({ lpsn: data,lpsnDispaly:"block" })
+        }
+        const sh =async (value,type) =>{
+            value = Object.assign({}, { orderSn:value,environment: this.state.environment, type: type });
+            console.log(value);
+            const response = await completeStoreOrder(value);
+            console.log(response)
+            responseJudge(response);
+        }
 
 
 
 
-        const { loading } = this.state;
+     
         return (
             <Card
                 loading={loading}
@@ -159,18 +179,41 @@ export default class Tire extends Component {
                         labelAlign='left'
                     >
                         <Form.Item className='item' label='司机手机号' name='orderSn' >
-                            <Input className='do' maxLength={11}/>
+                            <Input className='do' maxLength={11} />
                         </Form.Item>
                         <Form.Item className='item' >
                             <Button type="primary" htmlType="submit" style={{ backgroundColor: 'yellow', color: 'black', margin: '0px 10px' }}>
-                            发放三包抵扣券
+                                发放三包抵扣券
                         </Button>
-                        <h>确保司机有质保中的质保卡</h>
+                            <h>确保司机有质保中的质保卡</h>
                         </Form.Item>
                     </Form>
                 </div>
-
-
+                <div style={{ margin: '20px', padding: '20px', border: '2px solid grey' }}>
+                    <Form
+                        name='form'
+                        layout='inline'
+                        hideRequiredMark={true}
+                        onFinish={onFinish6}
+                        labelAlign='left'
+                    >
+                        <Form.Item className='item' label='司机手机号' name='orderSn' >
+                            <Input className='do' maxLength={11} />
+                        </Form.Item>
+                        <Form.Item className='item' >
+                            <Button type="primary" htmlType="submit" style={{ backgroundColor: 'yellow', color: 'black', margin: '0px 10px' }}>
+                                门店发起线上理赔
+                        </Button>
+                            <h>确保司机有质保中的质保卡</h>
+                        </Form.Item>
+                    </Form>
+                    <div style={{display: lpsnDispaly}}>
+                        <h1>理赔单号{lpsn}</h1>
+                        <Button  onClick={()=>sh(lpsn,7)} style={{backgroundColor:"grey",margin:"0 5px"}}>审核通过</Button>
+                        <Button  onClick={()=>sh(lpsn,8)} style={{backgroundColor:"grey",margin:"0 5px"}}>审核失败</Button>
+                        <Button  onClick={()=>sh(lpsn,9)} style={{backgroundColor:"grey",margin:"0 5px"}}>作废</Button>
+                    </div>
+                </div>
             </Card>
         )
 

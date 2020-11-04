@@ -45,7 +45,7 @@ const menuList = [
                 icon: <StarTwoTone twoToneColor="white" />
             },
             {
-                title: '测试页面',
+                title: '用例管理',
                 key: '/guiTest/test',
                 icon: <StarTwoTone twoToneColor="white" />
             },
