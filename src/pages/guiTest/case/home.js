@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Card, Table, Button, Tag, Select, Input, Modal } from 'antd'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../../apitest/index.less'
-import { getGuiList,getOneGuiData } from '../../../api/index'
+import { getGuiList, getOneGuiData } from '../../../api/index'
 import { deviceNameOfList, deviceColorOfList, deviceSelect, responseJudge } from '../../../components/public'
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 export default class GuiCaseHome extends Component {
@@ -78,6 +78,14 @@ export default class GuiCaseHome extends Component {
                             color = 'red';
                             value = '清除';
                             break;
+                        case 5:
+                            color = 'black';
+                            value = '下滑';
+                            break;
+                        case 6:
+                            color = 'orange';
+                            value = '上滑';
+                            break;
                         default:
                             break;
 
@@ -97,7 +105,7 @@ export default class GuiCaseHome extends Component {
                 render: (list) => {
                     return (<div >
                         {/* <a style={{ padding: "0 5px" }} onClick={() => this.props.history.push('/guiTest/case/addUpdate')}><PlusOutlined /></a> */}
-                        <a style={{ padding: "0 5px" }} onClick={()=>this.getOneGuiData(list.id)}><EditOutlined /></a>
+                        <a style={{ padding: "0 5px" }} onClick={() => this.getOneGuiData(list.id)}><EditOutlined /></a>
                         <a style={{ padding: "0 5px" }}><DeleteOutlined twoToneColor="red" />
                         </a>
                     </div>)
@@ -123,13 +131,13 @@ export default class GuiCaseHome extends Component {
         }
     }
 
-    getOneGuiData = async(id) =>{
+    getOneGuiData = async (id) => {
         const response = await getOneGuiData(id);
         const result = responseJudge(response);
         if (result) {
             const data = result.data;
             this.props.history.push('/guiTest/case/addUpdate', data);
-        } 
+        }
     }
     render() {
         const { data
@@ -143,7 +151,7 @@ export default class GuiCaseHome extends Component {
         )
 
         return (
-            <Card className='apihomep guicasehome' extra = {extra}>
+            <Card className='apihomep guicasehome' extra={extra}>
                 <Table
                     columns={this.columns}
                     bordered

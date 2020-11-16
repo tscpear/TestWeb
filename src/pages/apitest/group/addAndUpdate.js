@@ -69,7 +69,7 @@ export default class GroupAddAndUpdate extends Component {
 
 
             <Card
-                className='groupadd myform'
+                className='guicasehomeadd myform'
                 title={title}
             >
                 <Form

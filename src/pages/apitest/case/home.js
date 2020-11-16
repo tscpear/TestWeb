@@ -5,6 +5,7 @@ import { getApiCaseData, getApiCaseList, delApiCaseData } from '../../../api/ind
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
+import storageUtils from '../../../utils/storageUtils'
 import { deviceNameOfList, deviceColorOfList, deviceSelect, responseJudge } from '../../../components/public'
 
 const Option = Select.Option
@@ -29,7 +30,8 @@ export default class ApiCaseHome extends Component {
             required: true,
             whitespace: true,
             message: "这你都不填，你以为你是客服吗！",
-        },]
+        },],
+        userList:[],
     }
 
     getApiCaseList = async (obj) => {
@@ -158,11 +160,24 @@ export default class ApiCaseHome extends Component {
                             break;
 
                     }
+                    
                     return (
                         <Tag color={color} key={value}>
                             {value}
                         </Tag>
                     )
+                }
+            },
+            {
+                title: '创建人',
+                dataIndex: 'createUserId',
+                key: 'createUserId',
+                align: "center",
+                width: 100,
+                render: (createUserId) => {
+                    const userList = this.state.userList;
+                    return userList[createUserId-1].name;
+                    
                 }
             },
             {
@@ -211,6 +226,8 @@ export default class ApiCaseHome extends Component {
 
     //为第一次render准备数据
     UNSAFE_componentWillMount() {
+        const userList = storageUtils.getData("user_list");
+        this.setState({userList})
         this.initColumns()
     }
     //执行异步任务

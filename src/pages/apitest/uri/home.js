@@ -5,6 +5,8 @@ import { getApiUriList, getApiData, delApiData, getApiForCaseData } from '../../
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
+import storageUtils from '../../../utils/storageUtils'
+
 import { deviceNameOfList, deviceColorOfList, deviceSelect,responseJudge} from '../../../components/public'
 export default class UriHome extends Component {
 
@@ -22,6 +24,7 @@ export default class UriHome extends Component {
             limit: PAGE_SIZE
         },
         apiData: {},
+        userList:[],
     }
 
 
@@ -106,6 +109,18 @@ export default class UriHome extends Component {
                 }
             },
             {
+                title: '创建人',
+                dataIndex: 'createUserId',
+                key: 'createUserId',
+                align: "center",
+                width: 100,
+                render: (createUserId) => {
+                    const userList = this.state.userList;
+                    return userList[createUserId-1].name;
+                    
+                }
+            },
+            {
                 title: '操作',
                 align: 'center',
                 key: 'action',
@@ -123,6 +138,8 @@ export default class UriHome extends Component {
         ]
 
     }
+
+    
 
 
 
@@ -182,12 +199,16 @@ export default class UriHome extends Component {
 
     //为第一次render准备数据
     UNSAFE_componentWillMount() {
+        const userList = storageUtils.getData("user_list");
+        this.setState({userList})
         this.initColumns()
     }
     //执行异步任务
     componentDidMount() {
         const { obj } = this.state
         this.getUriList(obj)
+       
+
     }
 
     rearchChange = (value, type) => {

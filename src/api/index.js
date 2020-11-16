@@ -111,6 +111,14 @@ export const addGuiData = (obj) => ajax("/gui/add", obj, "POST")
 
 export const getGuiList = () => ajax("/gui/list", {}, "GET")
 
-export const getOneGuiData = (id) =>ajax(`/gui/getOne?id=${id}`,{},"GET")
+export const getOneGuiData = (id) => ajax(`/gui/getOne?id=${id}`, {}, "GET")
 
-export const updateGuiData = (obj) =>ajax('/gui/update',obj,'POST')
+export const updateGuiData = (obj) => ajax('/gui/update', obj, 'POST')
+
+export const addGuiGroup = (obj) => ajax('/gui/group/add', obj, 'POST')
+
+export const getGuiGroupList = () => ajax('/gui/group/list', {}, 'GET')
+
+export const getGuiGroupOne = (id) => ajax(`/gui/group/one?id=${id}`, {}, 'GET')
+
+export const updateGuiGroupData = (obj) => ajax('/gui/group/update',obj,'POST')

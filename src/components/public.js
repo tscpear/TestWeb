@@ -10,6 +10,7 @@ import { DEVICE_COLOR } from '../utils/constants'
 const deviceNames = storageUtils.getData('device_list_key')
 const ReachableContext = React.createContext();
 const UnreachableContext = React.createContext();
+
 /**
  * 形成选择设备的option
  * @param {设备名称} item 
@@ -18,6 +19,7 @@ const UnreachableContext = React.createContext();
 const deviceSelects = (item, index) => {
     return <Select.Option value={index + 1} key={index + 1}>{item}</Select.Option>
 }
+
 
 
 /**
@@ -83,3 +85,5 @@ export const confirmationTwo = (value) => {
     };
     return modal.confirm(config);
 }
+
+

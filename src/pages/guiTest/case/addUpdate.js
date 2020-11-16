@@ -4,8 +4,8 @@ import {
     Card, Form, Input, Select, Button,
     Tag, Radio, Checkbox, Row, Col, Switch, InputNumber
 } from 'antd'
-import { ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined, SoundTwoTone } from '@ant-design/icons';
-import { addGuiData ,updateGuiData} from '../../../api/index'
+import { ArrowLeftOutlined, FieldStringOutlined, MinusCircleOutlined, PlusOutlined, SoundTwoTone } from '@ant-design/icons';
+import { addGuiData, updateGuiData } from '../../../api/index'
 import { deviceSelect, responseJudge } from '../../../components/public'
 export default class AddUpdate extends Component {
     state = {
@@ -24,8 +24,8 @@ export default class AddUpdate extends Component {
 
     }
     componentDidMount = () => {
-        if(this.props.location.state){
-            this.setState({pageTitle:"编    辑"});
+        if (this.props.location.state) {
+            this.setState({ pageTitle: "编    辑" });
             this.activeOnChange(this.props.location.state.active);
         }
     }
@@ -53,11 +53,11 @@ export default class AddUpdate extends Component {
         const onFinish = async (value) => {
             var response;
             var result;
-            if(this.props.location.state){
-                value = Object.assign(value,{id:this.props.location.state.id})
+            if (this.props.location.state) {
+                value = Object.assign(value, { id: this.props.location.state.id })
                 response = await updateGuiData(value);
-            }else{
-                 response = await addGuiData(value);
+            } else {
+                response = await addGuiData(value);
             }
             result = responseJudge(response);
             if (result) {
@@ -107,12 +107,14 @@ export default class AddUpdate extends Component {
                             <Select.Option value={2}>双击</Select.Option>
                             <Select.Option value={3}>输入</Select.Option>
                             <Select.Option value={4}>清除</Select.Option>
+                            <Select.Option value={5}>下滑</Select.Option>
+                            <Select.Option value={6}>上滑</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item className='item' label={labelValue('输入内容')} name='keyValue' style={{ display: keyValueDisplay }}>
                         <Input className='do' />
                     </Form.Item >
-                    <Form.Item className='item' label={labelValue('断言元素')} name='assertElement'>
+                    {/* <Form.Item className='item' label={labelValue('断言元素')} name='assertElement'>
                         <Input className='do' />
                     </Form.Item >
                     <Form.Item className='item' label={labelValue('断元类型')} name='assertElementType'>
@@ -123,8 +125,74 @@ export default class AddUpdate extends Component {
                         </Select>
                     </Form.Item>
                     <Form.Item className='item' label={labelValue('断言内容')} name='assertExpect'>
-                        <Input className='do' placeholder="如果为空则断言该元素是否存在"/>
-                    </Form.Item >
+                        <Input className='do' placeholder="如果为空则断言该元素是否存在" />
+                    </Form.Item > */}
+
+                    <div style={{ width: '100%', margin: '0px 0px 0px 20px' }}>
+                        <Form.List name="assertExpectValue">
+                            {(fields, { add, remove }) => {
+                                return (
+                                    <div>
+                                        {fields.map((field, index) => (
+                                            <Row key={field.key}>
+                                                <Col style={{width:"30%"}}>
+                                                    <Form.Item
+                                                        label={labelValue('断言元素')}
+                                                        labelCol={{ span: 4 }}
+                                                        name={[field.name, 'assertElementType']}
+                                                        fieldKey={[field.fieldKey, 'assertElementType']}>
+                                                        <Input className='do'/>
+                                                    </Form.Item >
+                                                </Col>
+                                                <Col>
+                                                    <Form.Item
+                                                        label={labelValue('断元类型')}
+                                                        labelCol={{ span: 7 }}
+                                                        name={[field.name, 'assertElement']}
+                                                        fieldKey={[field.fieldKey, 'assertElement']}>
+                                                        <Select autoFocus={true} style={{ width: '200px' }}>
+                                                            <Select.Option value={1}>id</Select.Option>
+                                                            <Select.Option value={2}>xpath</Select.Option>
+                                                            <Select.Option value={3}>css</Select.Option>
+                                                        </Select>
+                                                    </Form.Item >
+                                                </Col>
+                                                <Col style={{width:"40%"}}>
+                                                    <Form.Item
+                                                        label={labelValue('断言内容')}
+                                                        labelCol={{ span: 3 }}
+                                                        name={[field.name, 'assertExpect']}
+                                                        fieldKey={[field.fieldKey, 'assertExpect']}>
+                                                        <Input className='do' placeholder="如果为空则断言该元素是否存在" />
+                                                    </Form.Item >
+                                                </Col>
+                                                <Col flex="none" style={{ width: '10%' }} >
+                                                <MinusCircleOutlined
+                                                    style={{ height: '20px', padding: '5px' }}
+                                                    onClick={() => {
+                                                        remove(field.name);
+                                                    }}
+                                                />
+                                            </Col>
+                                            </Row>
+
+                                        ))}
+                                        <Form.Item>
+                                            <Button
+                                                onClick={() => {
+                                                    add();
+                                                }}
+                                                style={{ width: "30%", marginTop: '5px' }}
+                                            >
+                                                <PlusOutlined /> 添加断言
+                                    </Button>
+                                        </Form.Item>
+                                    </div>
+                                )
+                            }}
+
+                        </Form.List>
+                    </div>
                     <Form.Item className='item' style={{ textAlign: 'center' }} >
                         <Button type="primary" htmlType="submit" style={{ backgroundColor: '#99CCFF	', color: 'black', margin: '0px 10px' }}>
                             提交

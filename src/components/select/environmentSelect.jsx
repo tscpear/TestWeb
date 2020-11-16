@@ -5,12 +5,7 @@ import {
 } from 'antd'
 
 class EnvironmentSelect extends React.Component {
-
-    
-
-
     render() {
-
         const environmentItem = storageUtils.getEnvironment();
         return (
             <Select autoFocus='true' style={{ width: '100px' }} defaultValue='uat' onChange={this.environmentOnChange}>

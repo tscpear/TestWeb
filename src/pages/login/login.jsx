@@ -55,6 +55,7 @@ export default class Login extends Component {
                 const projectName = result.projectName;
                 const deviceList = result.device;
                 const token = result.token;
+                const userList = result.userList;
                 memoryUtils.projectId = projectId
                 storageUtils.saveData('project_id_key',projectId)
                 memoryUtils.user = user
@@ -63,6 +64,8 @@ export default class Login extends Component {
                 storageUtils.saveData('project_name_key',projectName);
                 storageUtils.saveData('device_list_key',deviceList);
                 storageUtils.saveData('token_key',token)
+                storageUtils.saveData('user_list',userList)
+                storageUtils.saveData('user_id',user.id);
                 this.props.history.replace('/')
             } else {
                 message.error(result.msg)
