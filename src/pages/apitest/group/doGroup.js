@@ -405,6 +405,23 @@ export default class DoGroup extends Component {
                 key: 'actValue',
             },
         ];
+        const dependColums = [
+            {
+                title: '依赖名称',
+                dataIndex: 'name',
+                key: 'name',
+            },
+            {
+                title: '获取路径',
+                dataIndex: 'path',
+                key: 'path',
+            },
+            {
+                title: '依赖值',
+                dataIndex: 'value',
+                key: 'value',
+            },
+        ];
         return (
             <Card style={{ height: "100%" }} title={card} extra={extra} className='groupDo myform'>
                 <Steps current={step} percent={60} direction="vertical" status={stepStatus} >
@@ -463,6 +480,19 @@ export default class DoGroup extends Component {
                             <Table
                                 columns={expectColumns}
                                 dataSource={requestData.responseValueExpectResult}
+                                size="small"
+                                pagination={false}>
+
+                            </Table>
+                        </Collapse.Panel>
+                    </Collapse>
+                    <Divider style={{ backgroundColor: "green" }} />
+                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 依赖值</p>
+                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                        <Collapse.Panel header="点一下" key="3" showArrow={false}>
+                            <Table
+                                columns={dependColums}
+                                dataSource={requestData.relyValueLook}
                                 size="small"
                                 pagination={false}>
 
