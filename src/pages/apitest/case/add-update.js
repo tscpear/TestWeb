@@ -105,7 +105,7 @@ export default class CaseAddUpdate extends Component {
         if (data.id) {
             this.setState({ title: '编辑用例', className: 'myform contentMaxHeight caseadd' })
         } else {
-            this.setState({ title: '新增用例', className: 'myform contentMaxHeight caseupdate',rules })
+            this.setState({ title: '新增用例', className: 'myform contentMaxHeight caseupdate', rules })
         }
 
 
@@ -401,7 +401,7 @@ export default class CaseAddUpdate extends Component {
             )
         }
 
-
+        const rulesForm = [{ required: true, message: '必填的' }];
         const onFinish = async (value) => {
             delete (value['apiMark']);
             delete (value['apiPath']);
@@ -490,30 +490,30 @@ export default class CaseAddUpdate extends Component {
                     {...forms()}
 
                 >
-                    <Form.Item className='item' label='接口路径' name='apiPath'>
+                    <Form.Item className='item' label='接口路径' name='apiPath' rules={rulesForm}>
                         <Input className='do' disabled />
                     </Form.Item>
-                    <Form.Item className='item' label='接口描述' name='apiMark'>
+                    <Form.Item className='item' label='接口描述' name='apiMark' rules={rulesForm}>
                         <Input className='do' disabled />
                     </Form.Item>
                     <div style={{ width: "100%" }}>
-                        <Form.Item className='itemss' label='角色类型' name='deviceType'>
+                        <Form.Item className='itemss' label='角色类型' name='deviceType' rules={rulesForm}>
                             <Radio.Group>
                                 {deviceTypeList()}
                             </Radio.Group>
                         </Form.Item>
                     </div>
-                    <Form.Item className='item' label='用例描述' name='apiCaseMark'>
+                    <Form.Item className='item' label='用例描述' name='apiCaseMark' rules={rulesForm}>
                         <Input className='do' />
                     </Form.Item>
-                    <Form.Item className='item' label='用例类型' name='apiCaseType'>
+                    <Form.Item className='item' label='用例类型' name='apiCaseType' rules={rulesForm}>
                         <Radio.Group>
                             <Radio value={1}><Tag color="green">正常使用</Tag></Radio>
                             <Radio value={2}><Tag color="geekblue">重在回归</Tag></Radio>
                             <Radio value={3}><Tag color="red">创建数据</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item className='item' label='用例等级' name='apiCaseLv' >
+                    <Form.Item className='item' label='用例等级' name='apiCaseLv' rules={rulesForm}>
                         <Radio.Group>
                             <Radio value={1}><Tag color="green">无关紧要</Tag></Radio>
                             <Radio value={2}><Tag color="geekblue">一般般啦</Tag></Radio>
@@ -531,8 +531,8 @@ export default class CaseAddUpdate extends Component {
                             {frist('selectRelyCase')}
                         </Form.Item>
                     </div>
-                    <div style={{ display: apiFiexdParamDisplay, width: '100%' }}>
-                        <Form.Item label='接口传参' className='item' name='apiHandleParam'>
+                    <div style={{ display: apiFiexdParamDisplay, width: '100%' }} >
+                        <Form.Item label='接口传参' className='item' name='apiHandleParam' rules={apiFiexdParamDisplay === 'none' ? '' : rulesForm}>
                             <Input placeholder='请输入参数' className='do' />
                         </Form.Item>
                     </div>
@@ -572,8 +572,8 @@ export default class CaseAddUpdate extends Component {
                             <Checkbox value={2} onChange={this.onChangeCloseCase}><Tag color="geekblue">贴身前置用例</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
-                    <div style={{ display: closeCaseDisplay, width: '100%' }}>
-                        <Form.Item className='item' label="贴身前置" name="closeCase">
+                    <div style={{ display: closeCaseDisplay, width: '100%' }} >
+                        <Form.Item className='item' label="贴身前置" name="closeCase" rules={closeCaseDisplay === 'none' ? '' : rulesForm}>
                             <InputNumber maxLength="3" className='do' />
                         </Form.Item>
                     </div>
@@ -610,7 +610,7 @@ export default class CaseAddUpdate extends Component {
                             <Select.Option value='500'>500</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item className='item' label='其他断言' name='otherAssertionType' style={{width:'80%'}}>
+                    <Form.Item className='item' label='其他断言' name='otherAssertionType' style={{ width: '80%' }}>
                         <Checkbox.Group >
                             <Checkbox value='1'><Tag color="purple">返回值结构断言</Tag></Checkbox>
                             <Checkbox value='2' onChange={this.responseValueExpectDisplayOnChange}><Tag color="purple">特定返回值断言</Tag></Checkbox>

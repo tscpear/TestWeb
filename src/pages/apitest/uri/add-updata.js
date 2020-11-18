@@ -60,6 +60,7 @@ export default class AddUpdata extends Component {
         bodyRelySearchName: [],
         apiRelySearchValue: undefined,
         device: 0,
+        dependDisable: true,
 
     }
     //接口参数的点击展示控制器
@@ -160,15 +161,15 @@ export default class AddUpdata extends Component {
 
     componentDidMount = () => {
         const apiData = this.props.location.state;
-        let device ;
+        let device;
 
         if (apiData && apiData.id) {
-            this.setState({ title: "编   辑",device },()=>{
+            this.setState({ title: "编   辑", device }, () => {
                 device = apiData.device;
                 this.headerParamTypeOnChange(apiData.headerParamType);
                 this.webformParamTypeOnChange(apiData.webformParamType);
                 this.bodyParamTypeOnChange(apiData.bodyParamType);
-            });         
+            });
             switch (apiData.apiParamType) {
                 case "1":
                     this.setState({ apiFiexdDispaly: 'block' });
@@ -182,7 +183,7 @@ export default class AddUpdata extends Component {
             if (apiData.isRely) {
                 this.setState({ isRelyDispay: 'block' })
             }
-            this.setState({device: apiData.device});
+            this.setState({ device: apiData.device });
         }
 
 
@@ -194,10 +195,10 @@ export default class AddUpdata extends Component {
         }
     }
 
-    more = () =>{
+    more = () => {
         if (this.props.location.state) {
             return this.props.location.state.more
-        }  
+        }
     }
 
     apiRelySearch = value => {
@@ -290,6 +291,7 @@ export default class AddUpdata extends Component {
             bodyFiexdParamDisplay,
             isRelyDispay,
             rules,
+            dependDisable,
         } = this.state
 
 
@@ -339,6 +341,7 @@ export default class AddUpdata extends Component {
                 return rule;
             };
             return (
+
                 <Form.List name={name} >
                     {(fields, { add, remove }) => {
                         return (
@@ -389,6 +392,7 @@ export default class AddUpdata extends Component {
                         );
                     }}
                 </Form.List>
+
             )
         }
 
@@ -541,6 +545,8 @@ export default class AddUpdata extends Component {
 
         const apiRelyNameOptions = this.state.apiRelySearchName.map(item => <Select.Option key={item}>{item}</Select.Option>);
 
+        const rulesForm = [{ required: true, message: '必填的' }];
+
         return (
             <Card title={title} className='myform contentMaxHeight apidatap' >
                 <Form
@@ -552,21 +558,21 @@ export default class AddUpdata extends Component {
                     labelAlign='left'
                     {...forms()}
                 >
-                    <Form.Item className='item' label='接口路径' name='apiPath' rules={rules}>
+                    <Form.Item className='item' label='接口路径' name='apiPath' rules={rulesForm}>
                         <Input className='do' />
                     </Form.Item >
-                    <Form.Item className='item' label='接口描述' name='apiMark' rules={rules}>
+                    <Form.Item className='item' label='接口描述' name='apiMark' rules={rulesForm}>
                         <Input className='do' />
                     </Form.Item>
-                    <Form.Item className='item' label='设备终端' name='device'>
-                        <Select autoFocus={true} style={{ width: '200px' }} onChange={(value) => this.setState({ device: value })} placeholder="请选择客户端">
+                    <Form.Item className='item' label='设备终端' name='device' rules={rulesForm}>
+                        <Select autoFocus={true} style={{ width: '200px' }} onChange={(value) => this.setState({ device: value ,dependDisable:false})} placeholder="请选择客户端">
                             {deviceSelect()}
                         </Select>
                     </Form.Item>
                     <Form.Item label='复数接口' className='item' name='more'>
-                        <Switch  defaultChecked={this.more()}/>
+                        <Switch defaultChecked={this.more()} />
                     </Form.Item>
-                    <Form.Item className='item' label='请求方式' name='apiMethod'>
+                    <Form.Item className='item' label='请求方式' name='apiMethod' rules={rulesForm}>
                         <Radio.Group>
                             <Radio value={1}><Tag color="gold">GET</Tag></Radio>
                             <Radio value={2}><Tag color="purple">POST</Tag></Radio>
@@ -577,17 +583,17 @@ export default class AddUpdata extends Component {
                         <Radio.Group onChange={this.apiParamTypeOnChange} >
                             <Radio value='0'><Tag color="orange">无参数</Tag></Radio>
                             <Radio value='1'><Tag color="orange">固定参数</Tag></Radio>
-                            <Radio value='2'><Tag color="orange">继承参数</Tag></Radio>
+                            <Radio value='2' disabled={dependDisable}><Tag color="orange" >继承参数</Tag></Radio>
                             <Radio value='3'><Tag color="orange">自定义参数</Tag></Radio>
                         </Radio.Group>
                     </Form.Item>
                     <div style={{ display: apiFiexdDispaly, width: '100%', margin: '0px 70px 0px 100px' }}>
-                        <Form.Item className='item' name='apiFiexdParam'  >
+                        <Form.Item className='item' name='apiFiexdParam' rules={apiFiexdDispaly === 'none' ? "" : rulesForm}>
                             <Input className='do' placeholder='请填写路径固定参数' />
                         </Form.Item>
                     </div>
                     <div style={{ display: apiRelyDispaly, width: '100%', margin: '0px 90px 0px 100px' }}>
-                        <Form.Item className='item' style={{ width: '30%' }} name='apiRelyParamName'>
+                        <Form.Item className='item' style={{ width: '30%' }} name='apiRelyParamName' rules={apiRelyDispaly === 'none' ? "" : rulesForm}>
                             <Select
                                 placeholder="请输入依赖的接口(依赖登入，输入login)"
                                 showSearch
@@ -619,7 +625,7 @@ export default class AddUpdata extends Component {
                     <Form.Item className='item' name='headerParam' label='Header' name='headerParamType' >
                         <Checkbox.Group onChange={e => this.headerParamTypeOnChange(e)}>
                             <Checkbox value='1'><Tag color="purple">固定参数</Tag></Checkbox>
-                            <Checkbox value='2'><Tag color="purple">继承参数</Tag></Checkbox>
+                            <Checkbox value='2' disabled={dependDisable}><Tag color="purple">继承参数</Tag></Checkbox>
                             <Checkbox value='3'><Tag color="purple">自定义参数</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
@@ -637,7 +643,7 @@ export default class AddUpdata extends Component {
                     <Form.Item className='item' name='webformParamType' label='webform' >
                         <Checkbox.Group onChange={e => this.webformParamTypeOnChange(e)}>
                             <Checkbox value='1'><Tag color="purple">固定参数</Tag></Checkbox>
-                            <Checkbox value='2'><Tag color="purple">继承参数</Tag></Checkbox>
+                            <Checkbox value='2' disabled={dependDisable}><Tag color="purple">继承参数</Tag></Checkbox>
                             <Checkbox value='3'><Tag color="purple">自定义参数</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
@@ -655,7 +661,7 @@ export default class AddUpdata extends Component {
                     <Form.Item className='item' name='bodyParamType' label='body' >
                         <Checkbox.Group onChange={e => this.bodyParamTypeOnChange(e)}>
                             <Checkbox value='1'><Tag color="purple">固定参数</Tag></Checkbox>
-                            <Checkbox value='2'><Tag color="purple">继承参数</Tag></Checkbox>
+                            <Checkbox value='2' disabled={dependDisable}><Tag color="purple">继承参数</Tag></Checkbox>
                             <Checkbox value='3'><Tag color="purple">自定义参数</Tag></Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
