@@ -3,6 +3,8 @@ import { Card, Table, Button, Tag, Select, Input, Modal } from 'antd'
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../../apitest/index.less'
 import { getGuiList, getOneGuiData } from '../../../api/index'
+import memoryUtils from '../../../utils/memoryUtils'
+import storageUtils from '../../../utils/storageUtils'
 import { deviceNameOfList, deviceColorOfList, deviceSelect, responseJudge } from '../../../components/public'
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 export default class GuiCaseHome extends Component {
@@ -12,7 +14,8 @@ export default class GuiCaseHome extends Component {
             {
                 id: 1
             }
-        ]
+        ],
+        userList:[],
     }
 
     //初始化所有的列
@@ -98,6 +101,19 @@ export default class GuiCaseHome extends Component {
                 }
             },
             {
+                title: '创建人',
+                dataIndex: 'createUserId',
+                key: 'createUserId',
+                align: "center",
+                width: 100,
+                render: (createUserId) => {
+                    const userList = this.state.userList;
+                    console.log(createUserId)
+                    return userList[createUserId-1].name;
+                    
+                }
+            },
+            {
                 title: '操作',
                 align: 'center',
                 key: 'action',
@@ -116,7 +132,9 @@ export default class GuiCaseHome extends Component {
     }
     //为第一次render准备数据
     UNSAFE_componentWillMount() {
-        this.initColumns()
+        const userList = storageUtils.getData("user_list");
+        this.setState({userList},()=> this.initColumns())
+      
 
     }
     componentDidMount() {

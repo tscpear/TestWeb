@@ -466,6 +466,23 @@ export default class DoTest extends Component {
                 key: 'actValue',
             },
         ];
+        const dependColums = [
+            {
+                title: '依赖名称',
+                dataIndex: 'name',
+                key: 'name',
+            },
+            {
+                title: '获取路径',
+                dataIndex: 'path',
+                key: 'path',
+            },
+            {
+                title: '依赖值',
+                dataIndex: 'value',
+                key: 'value',
+            },
+        ];
         const showTotal = (total, range) => {
 
             return "共 " + total + " 条"
@@ -537,6 +554,19 @@ export default class DoTest extends Component {
                             <Table
                                 columns={expectColumns}
                                 dataSource={requestData.responseValueExpectResult}
+                                size="small"
+                                pagination={false}>
+
+                            </Table>
+                        </Collapse.Panel>
+                    </Collapse>
+                    <Divider style={{ backgroundColor: "green" }} />
+                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 依赖值</p>
+                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                        <Collapse.Panel header="点一下" key="3" showArrow={false}>
+                            <Table
+                                columns={dependColums}
+                                dataSource={requestData.relyValueLook}
                                 size="small"
                                 pagination={false}>
 

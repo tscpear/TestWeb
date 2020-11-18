@@ -497,7 +497,7 @@ export default class CaseAddUpdate extends Component {
                         <Input className='do' disabled />
                     </Form.Item>
                     <div style={{ width: "100%" }}>
-                        <Form.Item className='itemss' label='角色类型' name='deviceType' >
+                        <Form.Item className='itemss' label='角色类型' name='deviceType' rules={rules}>
                             <Radio.Group>
                                 {deviceTypeList()}
                             </Radio.Group>

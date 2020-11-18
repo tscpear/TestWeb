@@ -6,6 +6,7 @@ import { getGuiGroupList, getGuiGroupOne, delGroup, getDoGroupData } from '../..
 import { PAGE_SIZE } from '../../../utils/constants'
 import '../../apitest/index.less'
 import { responseJudge } from '../../../components/public'
+import storageUtils from '../../../utils/storageUtils'
 export default class Test extends Component {
     state = {
         total: 0,
@@ -24,7 +25,9 @@ export default class Test extends Component {
 
     //为第一次render准备数据
     UNSAFE_componentWillMount() {
-        this.initColumns()
+        const userList = storageUtils.getData("user_list");
+        this.setState({userList},()=> this.initColumns())
+      
 
     }
     componentDidMount() {
@@ -73,6 +76,18 @@ export default class Test extends Component {
                 key: '',
                 width: 100,
                 align: "center",
+            },
+            {
+                title: '创建人',
+                dataIndex: 'createUserId',
+                key: 'createUserId',
+                align: "center",
+                width: 100,
+                render: (createUserId) => {
+                    const userList = this.state.userList;
+                    return userList[createUserId-1].name;
+                    
+                }
             },
             {
                 title: '操作',

@@ -114,20 +114,6 @@ export default class AddUpdate extends Component {
                     <Form.Item className='item' label={labelValue('输入内容')} name='keyValue' style={{ display: keyValueDisplay }}>
                         <Input className='do' />
                     </Form.Item >
-                    {/* <Form.Item className='item' label={labelValue('断言元素')} name='assertElement'>
-                        <Input className='do' />
-                    </Form.Item >
-                    <Form.Item className='item' label={labelValue('断元类型')} name='assertElementType'>
-                        <Select autoFocus={true} style={{ width: '200px' }}>
-                            <Select.Option value={1}>id</Select.Option>
-                            <Select.Option value={2}>xpath</Select.Option>
-                            <Select.Option value={3}>css</Select.Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item className='item' label={labelValue('断言内容')} name='assertExpect'>
-                        <Input className='do' placeholder="如果为空则断言该元素是否存在" />
-                    </Form.Item > */}
-
                     <div style={{ width: '100%', margin: '0px 0px 0px 20px' }}>
                         <Form.List name="assertExpectValue">
                             {(fields, { add, remove }) => {

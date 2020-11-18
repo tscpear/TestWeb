@@ -559,8 +559,7 @@ export default class AddUpdata extends Component {
                         <Input className='do' />
                     </Form.Item>
                     <Form.Item className='item' label='设备终端' name='device'>
-                        <Select autoFocus={true} style={{ width: '200px' }} onChange={(value) => this.setState({ device: value })}>
-                            <Select.Option value={0}>请选择设备</Select.Option>
+                        <Select autoFocus={true} style={{ width: '200px' }} onChange={(value) => this.setState({ device: value })} placeholder="请选择客户端">
                             {deviceSelect()}
                         </Select>
                     </Form.Item>
