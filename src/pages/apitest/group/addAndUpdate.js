@@ -82,6 +82,7 @@ export default class GroupAddAndUpdate extends Component {
                     <Form.Item name="groupMark">
                         <Input placeholder="流程描述"  className='do'/>
                     </Form.Item>
+                    <h1 style={{color: 'yellow'}}> 格式：[1,2,3,-2,5];整数为用例Id，负数为等待时间，单位为秒；同一组中最好不要一样的用例</h1>
                     <Form.List name='caseList'>
                         {(fields, { add, remove }) => {
                             return (
@@ -92,8 +93,9 @@ export default class GroupAddAndUpdate extends Component {
                                                 <Form.Item
                                                     name={[field.name, 'caseList']}
                                                     fieldKey={[field.fieldKey, 'caseList']}
+                                                    rules = {[{ required: true, message: '示例[1,2,3,4]', pattern: new RegExp(/^[-0-9,\[\]]+$/, 'g') }]}
                                                 >
-                                                    <Input placeholder="请按顺序输入测试用例的ID" style={{ width: "300px" }}  className='do'/>
+                                                    <Input placeholder="请按顺序输入测试用例的ID" style={{ width: "300px" }}  className='do'  />
                                                 </Form.Item>
                                             </Col>
                                             <Col style={{ padding: '0px 10px' }}>
