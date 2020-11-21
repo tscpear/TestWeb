@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { Component , useState, useEffect } from 'react'
 import { ArrowLeftOutlined, MinusCircleOutlined, UserOutlined, StopOutlined, LockOutlined, SendOutlined, SyncOutlined } from '@ant-design/icons';
 import {
     Card, Form, Input, Button, Modal,
     Row, Col, Steps, Timeline, Select, Tag, message, Collapse, Table, Divider
-    , Drawer
+    , Drawer, Anchor
 } from 'antd'
 import { putToken, getAccountList, doGroupOne, getOneReport } from '../../../api/index'
 import { deviceNameOfList, deviceColorOfList, responseJudge } from '../../../components/public'
@@ -73,7 +73,7 @@ export default class DoGroup extends Component {
                 {this.accountLine(account)}
             </Timeline>
         )
-        option.push(<Steps.Step title="登入" description={accountDescription} icon={<UserOutlined />} />);
+        option.push(<Steps.Step title="登入" description={accountDescription} icon={<UserOutlined />} id ={0}/>);
         doGroupOfRealyDataToCaseLists.map((item, index) => {
             let list = item.dataForReadyGroups;
             let title = item.teamName;
@@ -82,7 +82,7 @@ export default class DoGroup extends Component {
                     {this.timeline(list)}
                 </Timeline>
             )
-            let steps = (<Steps.Step title={title} description={description} />)
+            let steps = (<Steps.Step title={title} description={description} id={index} />)
             option.push(steps);
 
         })
@@ -237,8 +237,20 @@ export default class DoGroup extends Component {
                     i--;
                     message.error("流程中断")
                     break;
+                } else {
+                    // this.props.history.replace(`/apitest/group/do#${i}`)
+                    // window.location.href = `http://localhost:3000/apitest/group/do#${i - 2}`
+                    // console.log("你妈妈吗")
+                    // console.log(document.querySelector(`#${i}`).offsetParent);
+                    // if(el.parentElement) {
+                    //     return this.getElementToPageTop(el.parentElement) + el.offsetTop
+                    //   }
+                    //   return el.offsetTop
+                    // console.log("你爸爸吧")
+                   
+                    this[`test${i-1}`].handleClick();
                 }
-            }    
+            }
         }
         console.log(num);
         console.log(i)
@@ -249,6 +261,18 @@ export default class DoGroup extends Component {
             this.setState({ stepStatus: "error" });
         }
 
+    }
+
+    huadong = (i) => {
+            const option =[];
+            for(let j = 1;j<i;j++){
+                let href =  `#${j}`
+                let id =`test${j}`
+                let link =   <Anchor.Link href={href} title="Static demo" id={id} ref={(div) => this[`test${j}`] = div} />
+                option.push(link)
+            }
+            return option;
+            
     }
 
     doOne = async (obj) => {
@@ -405,6 +429,7 @@ export default class DoGroup extends Component {
                 key: 'actValue',
             },
         ];
+        
         const dependColums = [
             {
                 title: '依赖名称',
@@ -422,8 +447,10 @@ export default class DoGroup extends Component {
                 key: 'value',
             },
         ];
+        
+        
         return (
-            <Card style={{ height: "100%" }} title={card} extra={extra} className='groupDo myform'>
+            <Card style={{ height: "100%" }} title={card} extra={extra} className='groupDo myform' margin='0px 0px 100px 0px'>
                 <Steps current={step} percent={60} direction="vertical" status={stepStatus} >
                     {this.step()}
                 </Steps>
@@ -503,6 +530,12 @@ export default class DoGroup extends Component {
                     <p className="site-description-item-profile-p" style={{ color: "green" }}> 返回值</p>
                     <pre><code id="json">  {JSON.stringify(requestData.response, undefined, 2)}</code></pre>
                 </Drawer>
+                <div style={{display:'none'}}>
+                    <Anchor affix={false} targetOffset={500} >
+                    <Anchor.Link href='#0' title="Static demo"  ref={(div) => this.test0 = div} />
+                    {this.huadong(10)}
+                    </Anchor>
+                </div>
 
             </Card>
         )
