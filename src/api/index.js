@@ -122,3 +122,5 @@ export const getGuiGroupList = () => ajax('/gui/group/list', {}, 'GET')
 export const getGuiGroupOne = (id) => ajax(`/gui/group/one?id=${id}`, {}, 'GET')
 
 export const updateGuiGroupData = (obj) => ajax('/gui/group/update',obj,'POST')
+
+export const getTestCaseNumReport = () => ajax('/home/testCaseReport',{},'GET')

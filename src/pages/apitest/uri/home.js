@@ -7,7 +7,7 @@ import '../index.less'
 import memoryUtils from '../../../utils/memoryUtils'
 import storageUtils from '../../../utils/storageUtils'
 
-import { deviceNameOfList, deviceColorOfList, deviceSelect,responseJudge} from '../../../components/public'
+import { deviceNameOfList, deviceColorOfList, deviceSelect, responseJudge } from '../../../components/public'
 export default class UriHome extends Component {
 
 
@@ -24,7 +24,7 @@ export default class UriHome extends Component {
             limit: PAGE_SIZE
         },
         apiData: {},
-        userList:[],
+        userList: [],
     }
 
 
@@ -116,8 +116,8 @@ export default class UriHome extends Component {
                 width: 100,
                 render: (createUserId) => {
                     const userList = this.state.userList;
-                    return userList[createUserId-1].name;
-                    
+                    return userList[createUserId - 1].name;
+
                 }
             },
             {
@@ -139,7 +139,7 @@ export default class UriHome extends Component {
 
     }
 
-    
+
 
 
 
@@ -149,7 +149,7 @@ export default class UriHome extends Component {
         const response = await getApiForCaseData(id, userId)
         this.setState({ loading: false })
         const result = responseJudge(response);
-        if(result){
+        if (result) {
             const apiForCaseData = result.data;
             this.props.history.push('/apitest/uri/addcase', apiForCaseData);
         }
@@ -175,7 +175,7 @@ export default class UriHome extends Component {
         if (result) {
             const apiData = result.data;
             this.props.history.push('/apitest/uri/updata', apiData);
-        } 
+        }
     }
 
     getUriList = async (obj) => {
@@ -194,20 +194,20 @@ export default class UriHome extends Component {
                 apiList,
                 total: count
             })
-        } 
+        }
     }
 
     //为第一次render准备数据
     UNSAFE_componentWillMount() {
         const userList = storageUtils.getData("user_list");
-        this.setState({userList})
+        this.setState({ userList })
         this.initColumns()
     }
     //执行异步任务
     componentDidMount() {
         const { obj } = this.state
         this.getUriList(obj)
-       
+
 
     }
 
@@ -270,6 +270,13 @@ export default class UriHome extends Component {
                 添加
             </Button>
         )
+        const showTotal = (total, range) => {
+            return (
+                <div style={{color:'grey'}}>
+                  {"共 " + total + " 条"}
+                </div>
+            )
+        }
 
         return (
             <Card title={title} extra={extra} className='apihomep' >
@@ -283,9 +290,15 @@ export default class UriHome extends Component {
                     pagination={{
                         defaultPageSize: PAGE_SIZE,
                         total: total,
+                        showTotal: showTotal,
                         onChange: (pageNum) => {
                             obj.page = pageNum
                             obj.limit = PAGE_SIZE
+                            this.getUriList(obj)
+                        },
+                        onShowSizeChange: (current, size) => {
+                            obj.page = 1
+                            obj.limit = size
                             this.getUriList(obj)
                         }
                     }}
