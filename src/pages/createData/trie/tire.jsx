@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { crateDataTire, doHouse, completeStoreOrder } from '../../../api/index'
 import { Card, message, Select, Input, Button, Form, Switch, Spin } from 'antd'
 import '../../apitest/index.less'
+import '../index.less'
 import { deviceSelect, responseJudge } from '../../../components/public'
 export default class Tire extends Component {
     state = {
@@ -14,7 +15,7 @@ export default class Tire extends Component {
         bt1: false,
         bt2: false,
         bt3: false,
-        rules1 : [{ required: true, message: '手机号要对', pattern: new RegExp(/^1\d{10}$/, 'g') }]
+        rules1: [{ required: true, message: '手机号要对', pattern: new RegExp(/^1\d{10}$/, 'g') }]
 
     }
 
@@ -48,10 +49,10 @@ export default class Tire extends Component {
     }
     bt4Click = () => {
         this.setState({ bt1: false, bt2: false, bt3: false });
-    } 
+    }
 
     render() {
-        const { loading, lpsn, lpsnDispaly, typeOfOne, bt1, bt2, bt3,rules1 } = this.state;
+        const { loading, lpsn, lpsnDispaly, typeOfOne, bt1, bt2, bt3, rules1 } = this.state;
 
         const onFinish1 = async (value) => {
             value = Object.assign(value, { environment: this.state.environment });
@@ -116,19 +117,26 @@ export default class Tire extends Component {
             this.setState({ loading: false })
             responseJudge(response);
         }
+        
+        var src = "等等啊大兄弟";
+        const antIcon = (
+            <div className = 'loading' style={{width:'100px',height:'100px'}}>
+                <div >
+
+                </div>
+            </div>
+        );
+
 
 
 
 
 
         return (
-
-
-
             <Card
                 className='tirex'
             >
-                <Spin spinning={loading} delay={500}  tip="Loading..." size="large">
+                <Spin spinning={true} delay={500} size="large" indicator={antIcon} >
                     <div style={{ margin: '20px' }}>
                         <Select autoFocus='true' style={{ width: '100px' }} defaultValue={1} onChange={this.environmentOnChange}>
                             <Select.Option value={1}>准生产</Select.Option>
@@ -238,7 +246,7 @@ export default class Tire extends Component {
                             onFinish={onFinish6}
                             labelAlign='left'
                         >
-                            <Form.Item className='item' label='司机手机号' name='orderSn' rules = {rules1} >
+                            <Form.Item className='item' label='司机手机号' name='orderSn' rules={rules1} >
                                 <Input className='do' maxLength={11} />
                             </Form.Item>
                             <Form.Item className='item' name='typeOfOne'>
@@ -253,9 +261,9 @@ export default class Tire extends Component {
                         </Form>
                         <div style={{ display: lpsnDispaly }}>
                             <h1>理赔单号{lpsn}</h1>
-                            <Button onClick={() => {sh(lpsn, 10);this.bt1Click()}} style={{ backgroundColor: "grey", margin: "0 5px" }} disabled={bt1} >审核通过</Button>
-                            <Button onClick={() => {sh(lpsn, 11);this.bt2Click()}} style={{ backgroundColor: "grey", margin: "0 5px" }} disabled={bt2} >审核失败</Button>
-                            <Button onClick={() => {sh(lpsn, 12);this.bt3Click()}} style={{ backgroundColor: "grey", margin: "0 5px" }} disabled={bt3}>作废</Button>
+                            <Button onClick={() => { sh(lpsn, 10); this.bt1Click() }} style={{ backgroundColor: "grey", margin: "0 5px" }} disabled={bt1} >审核通过</Button>
+                            <Button onClick={() => { sh(lpsn, 11); this.bt2Click() }} style={{ backgroundColor: "grey", margin: "0 5px" }} disabled={bt2} >审核失败</Button>
+                            <Button onClick={() => { sh(lpsn, 12); this.bt3Click() }} style={{ backgroundColor: "grey", margin: "0 5px" }} disabled={bt3}>作废</Button>
 
                         </div>
 
