@@ -20,7 +20,7 @@
   <script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>
   <script>
     newL2Dwidget = function () {
-      let urls = ["https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json", "https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json ", "https://unpkg.com/live2d-widget-model-haruto@1.0.5/assets/haruto.model.json"];
+      // let urls = ["https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json", "https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json ", "https://unpkg.com/live2d-widget-model-haruto@1.0.5/assets/haruto.model.json"];
       L2Dwidget.init({
         "model": {
           jsonPath:
@@ -32,20 +32,20 @@
         }, "mobile": { "show": true, "scale": 0.5 },
         "react": { "opacityDefault": 0.7, "opacityOnHover": 0.2 }
       });
-      setInterval(function () {
-        var sar = Math.floor((Math.random() * urls.length));
-        L2Dwidget.init({
-          "model": {
-            jsonPath:
-              urls[sar],
-            "scale": 1
-          }, "display": {
-            "position": "left", "width": 100, "height": 200,
-            "hOffset": 0, "vOffset": -20
-          }, "mobile": { "show": true, "scale": 0.5 },
-          "react": { "opacityDefault": 0.7, "opacityOnHover": 0.2 }
-        });
-      }, 60000)
+      // setInterval(function () {
+      //   var sar = Math.floor((Math.random() * urls.length));
+      //   L2Dwidget.init({
+      //     "model": {
+      //       jsonPath:
+      //         urls[sar],
+      //       "scale": 1
+      //     }, "display": {
+      //       "position": "left", "width": 100, "height": 200,
+      //       "hOffset": 0, "vOffset": -20
+      //     }, "mobile": { "show": true, "scale": 0.5 },
+      //     "react": { "opacityDefault": 0.7, "opacityOnHover": 0.2 }
+      //   });
+      // }, 60000)
     }
   </script>
   <script>

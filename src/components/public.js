@@ -69,6 +69,7 @@ export const responseJudge = (response) => {
         memoryUtils.user = {}
     } else if (result.code === 0) {
         message.error(msg);
+        return result;
     } else {
         return result;
     }
