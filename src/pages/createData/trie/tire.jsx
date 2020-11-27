@@ -136,7 +136,7 @@ export default class Tire extends Component {
             <Card
                 className='tirex'
             >
-                <Spin spinning={true} delay={500} size="large" indicator={antIcon} >
+                <Spin spinning={loading} delay={500} size="large" indicator={antIcon} >
                     <div style={{ margin: '20px' }}>
                         <Select autoFocus='true' style={{ width: '100px' }} defaultValue={1} onChange={this.environmentOnChange}>
                             <Select.Option value={1}>准生产</Select.Option>
