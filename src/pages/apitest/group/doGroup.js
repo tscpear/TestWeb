@@ -1,4 +1,4 @@
-import React, { Component , useState, useEffect } from 'react'
+import React, { Component, useState, useEffect } from 'react'
 import { ArrowLeftOutlined, MinusCircleOutlined, UserOutlined, StopOutlined, LockOutlined, SendOutlined, SyncOutlined } from '@ant-design/icons';
 import {
     Card, Form, Input, Button, Modal,
@@ -42,6 +42,9 @@ export default class DoGroup extends Component {
             bodyParam: [],
 
         },
+        paramArray: [],
+        paramTestId: [],
+
     }
     showDrawer = async (id) => {
         await this.getOneReport(id);
@@ -73,7 +76,7 @@ export default class DoGroup extends Component {
                 {this.accountLine(account)}
             </Timeline>
         )
-        option.push(<Steps.Step title="登入" description={accountDescription} icon={<UserOutlined />} id ={0}/>);
+        option.push(<Steps.Step title="登入" description={accountDescription} icon={<UserOutlined />} id={0} />);
         doGroupOfRealyDataToCaseLists.map((item, index) => {
             let list = item.dataForReadyGroups;
             let title = item.teamName;
@@ -115,6 +118,30 @@ export default class DoGroup extends Component {
             option.push(accountLines);
         })
         return option;
+    }
+    paramArray = () => {
+
+        let option = [];
+        this.state.paramArray.map((item, index) => {
+            let name = item.newName;
+            let value = item.value;
+            let son = (
+                <div style={{ margin: '10px' }}>
+                    <div style={{ width: '20%', display: 'inline-block' }} >
+                        <Tag color="#2db7f5">{name}</Tag>
+                    </div>
+                    <Input defaultValue={value} onChange={(e) => this.paramArrayOnChange(e, index)} style={{ width: '60%', display: 'inline' }}  className='do'/>
+                </div>
+            )
+            option.push(son);
+        });
+        return option;
+    }
+
+    paramArrayOnChange = (e, index) => {
+        var paramArray = this.state.paramArray
+        paramArray[index].value = e.target.value
+        this.setState({ paramArray });
     }
 
     timeline = (data) => {
@@ -222,15 +249,14 @@ export default class DoGroup extends Component {
     }
 
     doAll = async () => {
-        const { num, id, environment, accountValue } = this.state;
+        const { num, id, environment, accountValue, paramArray, paramTestId } = this.state;
         console.log(num);
         var next = true;
         var i;
         for (i = 1; i <= num; i++) {
             if (next === true) {
                 var reportId = this.state.reportId;
-                console.log(reportId)
-                var obj = Object.assign({ 'groupId': id, 'teamId': i, "environment": environment, 'accountValue': accountValue, "reportId": reportId })
+                var obj = Object.assign({ 'groupId': id, 'teamId': i, "environment": environment, 'accountValue': accountValue, "reportId": reportId, "paramArray": paramArray, "paramTestId": paramTestId })
                 next = await this.doOne(obj);
                 this.setState({ step: i });
                 if (next === false) {
@@ -238,17 +264,7 @@ export default class DoGroup extends Component {
                     message.error("流程中断")
                     break;
                 } else {
-                    // this.props.history.replace(`/apitest/group/do#${i}`)
-                    // window.location.href = `http://localhost:3000/apitest/group/do#${i - 2}`
-                    // console.log("你妈妈吗")
-                    // console.log(document.querySelector(`#${i}`).offsetParent);
-                    // if(el.parentElement) {
-                    //     return this.getElementToPageTop(el.parentElement) + el.offsetTop
-                    //   }
-                    //   return el.offsetTop
-                    // console.log("你爸爸吧")
-                   
-                    this[`test${i-1}`].handleClick();
+                    this[`test${i - 1}`].handleClick();
                 }
             }
         }
@@ -264,15 +280,15 @@ export default class DoGroup extends Component {
     }
 
     huadong = (i) => {
-            const option =[];
-            for(let j = 1;j<i;j++){
-                let href =  `#${j}`
-                let id =`test${j}`
-                let link =   <Anchor.Link href={href} title="Static demo" id={id} ref={(div) => this[`test${j}`] = div} />
-                option.push(link)
-            }
-            return option;
-            
+        const option = [];
+        for (let j = 1; j < i; j++) {
+            let href = `#${j}`
+            let id = `test${j}`
+            let link = <Anchor.Link href={href} title="Static demo" id={id} ref={(div) => this[`test${j}`] = div} />
+            option.push(link)
+        }
+        return option;
+
     }
 
     doOne = async (obj) => {
@@ -309,6 +325,15 @@ export default class DoGroup extends Component {
         var testList = data.testList;
         var id = data.groupId;
         var num = data.doGroupOfRealyDataToCaseLists.length;
+        var paramArray = data.paramArray;
+        var paramTestId = data.paramTestId;
+        if (paramArray) {
+            this.setState({ paramArray });
+        }
+        if (paramTestId) {
+            this.setState({ paramTestId });
+        }
+
         account.map((item, index) => {
             accountValue[index] = item.device + '.' + item.deviceType + '.' + 1;
         });
@@ -316,7 +341,7 @@ export default class DoGroup extends Component {
         this.environmentOnChange(1);
     }
     render() {
-        const { dotestName, account, environmentItem, bigTitle, step, stepStatus, requestData } = this.state;
+        const { dotestName, account, environmentItem, bigTitle, step, stepStatus, requestData, paramArray, paramTestId } = this.state;
         const accountTitle = (
             <div>
                 <span style={{ margin: "0px 100px 0px 0px" }}>
@@ -429,7 +454,7 @@ export default class DoGroup extends Component {
                 key: 'actValue',
             },
         ];
-        
+
         const dependColums = [
             {
                 title: '依赖名称',
@@ -447,94 +472,99 @@ export default class DoGroup extends Component {
                 key: 'value',
             },
         ];
-        
-        
+
+
         return (
             <Card style={{ height: "100%" }} title={card} extra={extra} className='groupDo myform' margin='0px 0px 100px 0px'>
-                <Steps current={step} percent={60} direction="vertical" status={stepStatus} >
-                    {this.step()}
-                </Steps>
-                <Drawer
-                    width={'60%'}
-                    placement="right"
-                    closable={false}
-                    onClose={this.onClose}
-                    visible={this.state.visible}
-                >
-                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 请求路径</p>
-                    <p className="site-description-item-profile-p">{requestData.apiMethod}      {requestData.apiPath}</p>
-                    <Divider style={{ backgroundColor: "green" }} />
+                <div style={{ width: '60%', display: 'inline-block' }}>
+                    <Steps current={step} percent={60} direction="vertical" status={stepStatus} >
+                        {this.step()}
+                    </Steps>
+                    <Drawer
+                        width={'60%'}
+                        placement="right"
+                        closable={false}
+                        onClose={this.onClose}
+                        visible={this.state.visible}
+                    >
+                        <p className="site-description-item-profile-p" style={{ color: "green" }}> 请求路径</p>
+                        <p className="site-description-item-profile-p">{requestData.apiMethod}      {requestData.apiPath}</p>
+                        <Divider style={{ backgroundColor: "green" }} />
 
-                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 请求参数</p>
-                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
-                        <Collapse.Panel header="请求头参数" key="1" showArrow={false}>
-                            <Table
-                                columns={dColumns}
-                                dataSource={requestData.headerParam}
-                                size="small"
-                                pagination={false}
+                        <p className="site-description-item-profile-p" style={{ color: "green" }}> 请求参数</p>
+                        <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                            <Collapse.Panel header="请求头参数" key="1" showArrow={false}>
+                                <Table
+                                    columns={dColumns}
+                                    dataSource={requestData.headerParam}
+                                    size="small"
+                                    pagination={false}
 
-                            />
+                                />
 
-                        </Collapse.Panel>
-                        <Collapse.Panel header="form表单参数" key="2" showArrow={false}>
-                            <Table
-                                columns={dColumns}
-                                dataSource={requestData.webformParam}
-                                size="small"
-                                pagination={false}>
+                            </Collapse.Panel>
+                            <Collapse.Panel header="form表单参数" key="2" showArrow={false}>
+                                <Table
+                                    columns={dColumns}
+                                    dataSource={requestData.webformParam}
+                                    size="small"
+                                    pagination={false}>
 
-                            </Table>
-                        </Collapse.Panel>
-                        <Collapse.Panel header="body参数" key="3" showArrow={false}>
-                            <pre><code id="json">  {JSON.stringify(requestData.bodyParam, undefined, 2)}</code></pre>
-                        </Collapse.Panel>
-                    </Collapse>
-                    <Divider style={{ backgroundColor: "green" }} />
-                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 期望断言</p>
-                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
-                        <Collapse.Panel header="状态码期望值" key="1" showArrow={false}>
-                            <Row>
-                                <Col span={12}>
-                                    <DescriptionItem title="期望状态码" content={requestData.expectStatus} />
-                                </Col>
-                                <Col span={12}>
-                                    <DescriptionItem title="实际状态码" content={requestData.actStatus} />
-                                </Col>
-                            </Row>
-                        </Collapse.Panel>
-                        <Collapse.Panel header="返回值期望" key="2" showArrow={false}>
-                            <Table
-                                columns={expectColumns}
-                                dataSource={requestData.responseValueExpectResult}
-                                size="small"
-                                pagination={false}>
+                                </Table>
+                            </Collapse.Panel>
+                            <Collapse.Panel header="body参数" key="3" showArrow={false}>
+                                <pre><code id="json">  {JSON.stringify(requestData.bodyParam, undefined, 2)}</code></pre>
+                            </Collapse.Panel>
+                        </Collapse>
+                        <Divider style={{ backgroundColor: "green" }} />
+                        <p className="site-description-item-profile-p" style={{ color: "green" }}> 期望断言</p>
+                        <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                            <Collapse.Panel header="状态码期望值" key="1" showArrow={false}>
+                                <Row>
+                                    <Col span={12}>
+                                        <DescriptionItem title="期望状态码" content={requestData.expectStatus} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <DescriptionItem title="实际状态码" content={requestData.actStatus} />
+                                    </Col>
+                                </Row>
+                            </Collapse.Panel>
+                            <Collapse.Panel header="返回值期望" key="2" showArrow={false}>
+                                <Table
+                                    columns={expectColumns}
+                                    dataSource={requestData.responseValueExpectResult}
+                                    size="small"
+                                    pagination={false}>
 
-                            </Table>
-                        </Collapse.Panel>
-                    </Collapse>
-                    <Divider style={{ backgroundColor: "green" }} />
-                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 依赖值</p>
-                    <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
-                        <Collapse.Panel header="点一下" key="3" showArrow={false}>
-                            <Table
-                                columns={dependColums}
-                                dataSource={requestData.relyValueLook}
-                                size="small"
-                                pagination={false}>
+                                </Table>
+                            </Collapse.Panel>
+                        </Collapse>
+                        <Divider style={{ backgroundColor: "green" }} />
+                        <p className="site-description-item-profile-p" style={{ color: "green" }}> 依赖值</p>
+                        <Collapse bordered={false} style={{ backgroundColor: "#fff" }}>
+                            <Collapse.Panel header="点一下" key="3" showArrow={false}>
+                                <Table
+                                    columns={dependColums}
+                                    dataSource={requestData.relyValueLook}
+                                    size="small"
+                                    pagination={false}>
 
-                            </Table>
-                        </Collapse.Panel>
-                    </Collapse>
-                    <Divider style={{ backgroundColor: "green" }} />
-                    <p className="site-description-item-profile-p" style={{ color: "green" }}> 返回值</p>
-                    <pre><code id="json">  {JSON.stringify(requestData.response, undefined, 2)}</code></pre>
-                </Drawer>
-                <div style={{display:'none'}}>
-                    <Anchor affix={false} targetOffset={500} >
-                    <Anchor.Link href='#0' title="Static demo"  ref={(div) => this.test0 = div} />
-                    {this.huadong(10)}
-                    </Anchor>
+                                </Table>
+                            </Collapse.Panel>
+                        </Collapse>
+                        <Divider style={{ backgroundColor: "green" }} />
+                        <p className="site-description-item-profile-p" style={{ color: "green" }}> 返回值</p>
+                        <pre><code id="json">  {JSON.stringify(requestData.response, undefined, 2)}</code></pre>
+                    </Drawer>
+                    <div style={{ display: 'none' }}>
+                        <Anchor affix={false} targetOffset={500} >
+                            <Anchor.Link href='#0' title="Static demo" ref={(div) => this.test0 = div} />
+                            {this.huadong(10)}
+                        </Anchor>
+                    </div>
+                </div>
+                <div style={{ width: '35%', display: 'inline-block' }}>
+                    {this.paramArray()}
                 </div>
 
             </Card>

@@ -13,7 +13,7 @@ export default class Uri extends Component{
     render(){
         return(
            <Switch>
-               <Route exact path='/apitest/uri' component = {UriHome}/>>
+               <Route exact path='/apitest/uri' component = {UriHome}/>
                <Route exact path='/apitest/uri/updata' component = {UriAddUpdata}/>
                <Route exact path='/apitest/uri/add' component = {UriAddUpdata}/>
                <Route exact path='/apitest/uri/addcase' component = {CaseAddUpdate}/>

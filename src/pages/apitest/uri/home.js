@@ -206,6 +206,10 @@ export default class UriHome extends Component {
     //执行异步任务
     componentDidMount() {
         const { obj } = this.state
+        const apiPath = this.props.location.state;
+        if (apiPath) {
+            obj.apiPath = apiPath;
+        }
         this.getUriList(obj)
 
 

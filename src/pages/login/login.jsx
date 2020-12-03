@@ -80,7 +80,7 @@ export default class Login extends Component {
                 <section className='login-content'>
                     <div className='login-title'>
                         <h1>
-                            <strong>测试平台2.0</strong>
+                            <strong>测试平台3.0</strong>
               Test Frist
             </h1>
                         <div className='login-description'>

@@ -95,6 +95,14 @@ export default class ApiCaseHome extends Component {
                 title: '接口路径',
                 dataIndex: 'apiPath',
                 key: 'apiPath',
+                render: (apiPath) => {
+                    return (
+                        <div>
+                            <a onClick={() => this.props.history.push('/apitest/case/uriList', apiPath)}>{apiPath}</a>
+                        </div>
+
+                    )
+                }
             },
             {
                 title: '描述',

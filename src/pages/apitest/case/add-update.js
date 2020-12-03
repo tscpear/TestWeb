@@ -181,6 +181,7 @@ export default class CaseAddUpdate extends Component {
                 }
             })
         }
+        
     }
     responseValueExpectDisplayOnChange = e => {
         if (e.target.checked) {
@@ -333,6 +334,61 @@ export default class CaseAddUpdate extends Component {
                 </Form.List>
             )
         }
+        //四级方法
+        const forth = (name, disabled) => {
+            const rules = () => {
+                const rules = [{
+                    required: true,
+                    whitespace: true,
+                    message: "咋不填呢",
+                }];
+                if (isRelyDisplay === "none") {
+                    return { "rule": rules };
+                }
+            }
+            return (
+                <Form.List name={name} >
+                    {(fields) => {
+                        return (
+                            <div>
+                                {fields.map((field) => (
+                                    <Row key={field.key} style={{ margin: '3px 0px' }}>
+                                        <Col style={{ width: '30%', margin: '0px 1px 0px 0px' }}>
+                                            <Form.Item
+                                                name={[field.name, 'name']}
+                                                fieldKey={[field.fieldKey, 'name']}
+                                                {...rules}
+                                            >
+                                                <Input className='do' disabled={true} />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col style={{ width: '60%' }}>
+                                            <Form.Item
+                                                name={[field.name, "value"]}
+                                                fieldKey={[field.fieldKey, "value"]}
+                                                {...rules}
+                                            >
+                                                <Input className='do' disabled={disabled} />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col style={{ width: '5%' }}>
+                                            <Form.Item
+                                                name={[field.name, "forGroup"]} 
+                                                fieldKey={[field.fieldKey, "forGroup"]}
+                                                valuePropName='checked'
+                                            >
+                                                <Switch />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                ))}
+                            </div>
+                        );
+                    }}
+                </Form.List>
+            )
+        }
+
         //三级级级方法
         const thrid = (name, fristPlaceholder, secondPlaceholder, addName, display) => {
             const rules = () => {
@@ -543,25 +599,25 @@ export default class CaseAddUpdate extends Component {
                             </div>
                             <div style={{ width: '45%', verticalAlign: 'top', display: 'inline-block' }}>
                                 <div style={{ width: '100%', display: headerHandleDisplay }}>
-                                    {second('headerHandleParam')}
+                                    {forth('headerHandleParam')}
                                 </div>
                                 <div style={{ width: '100%', display: headerRelyDisplay }}>
-                                    {second('headerRelyToHandle')}
+                                    {forth('headerRelyToHandle')}
                                 </div>
                             </div>
                         </Form.Item>
                     </div>
                     <div style={{ display: webformParamDisplay, width: '100%' }} >
                         <Form.Item label='表单参数' className='itemss'>
-                            <div style={{ width: '45%', display: 'inline-block', verticalAlign: 'top' }}>
+                            <div style={{ width: '40%', display: 'inline-block', verticalAlign: 'top' }}>
                                 {second('webformFiexdParam', true)}
                             </div>
-                            <div style={{ width: '45%', verticalAlign: 'top', display: 'inline-block' }}>
+                            <div style={{ width: '50%', verticalAlign: 'top', display: 'inline-block' }}>
                                 <div style={{ width: '100%', display: webformHandleDisplay }}>
-                                    {second('webformHandleParam')}
+                                    {forth('webformHandleParam')}
                                 </div>
                                 <div style={{ width: '100%', display: webformRelyDisplay }}>
-                                    {second('webformRelyToHandle')}
+                                    {forth('webformRelyToHandle')}
                                 </div>
                             </div>
                         </Form.Item>
